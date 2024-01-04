@@ -122,15 +122,108 @@ CreateUsbFlashUpdate()
 	echo "Create USB Flash Update files"
 
 	mkdir -p $OUTPUT_PATH
-
 	#split -d -a 1 -b 1G $ARMBIAN_IMAGE_PATH/*.img $OUTPUT_PATH/update.img. --verbose
 
-	fileCnt=$(ls -l "update.img.*" | wc -l)
+	#create boot script 
+	fileCnt=$(ls -l $OUTPUT_PATH/update.img.* | wc -l)
+	touch $BUILD_PATH/boot.cmd
 
-	echo $fileCnt
+	cat > $BUILD_PATH/boot.cmd <<- EOF
+	echo "******************************************"
+	echo "usb update starting"
+	echo "******************************************"
 
-	touch $OUTPUT_PATH/boot.cmd
+	setenv load_addr "0x9000000"
+	setenv load_size "0x40000000"
 
+	setenv load_addr_part_0 "0x0000000"
+	setenv load_addr_part_1 "0x0200000"
+	setenv load_addr_part_2 "0x0400000"
+	setenv load_addr_part_3 "0x0600000"
+	setenv load_addr_part_4 "0x0800000"
+	setenv load_addr_part_5 "0x0A00000"
+	setenv load_addr_part_6 "0x0C00000"
+	setenv load_addr_part_7 "0x0E00000"
+	setenv load_addr_part_8 "0x1000000"
+	setenv load_addr_part_9 "0x1200000"
+	EOF
+
+
+
+	cat >> $BUILD_PATH/boot.cmd <<- EOF
+
+
+	mmc rescan
+	mmc list
+	mmc dev 0
+
+	usb reset
+	usb dev 0
+
+	mmc list
+	mmc dev
+
+	if test -e usb 0:1 update.img.0 ; then
+	    echo "******************************************"
+	    echo "usb: there is update file"
+
+	    #turn on red led
+	    gpio clear gpio211
+
+	    #turn off blue led
+	    gpio set gpio212
+
+	EOF
+
+	for (( i=0; i<$fileCnt; i++ ))
+	do
+		cat >> $BUILD_PATH/boot.cmd <<- EOF
+
+	    size usb 0:1 update.img.$i
+	    echo "usb: part $i image size: \${filesize} bytes"	
+	    echo "usb: wait for copy part $i image to DDR"
+	    fatload usb 0:1 \${load_addr} update.img.$i
+	    echo "usb: part $i copy complete"	
+	    setexpr file_size_blk \${filesize} / 0x200
+	    echo "emmc: part $i image block size: \${file_size_blk}"	
+	    echo "emmc: wait for copy part $i image to eMMC"
+	    mmc write \${load_addr} \${load_addr_part_$i} \${file_size_blk}
+	    echo "emmc: part $i copy completed"
+		
+		EOF
+	done
+
+
+	cat >> $BUILD_PATH/boot.cmd <<- EOF
+
+	    rkimgtest mmc 0
+
+	    echo " "
+	    echo "please remove USB"
+	    echo ""
+	    echo "******************************************"
+
+	    #turn off red led
+	    gpio set gpio211
+
+	    #turn on blue led
+	    gpio clear gpio212	
+
+	    while true ; do ; 
+	    gpio set gpio212 && 
+	    usb reset &&
+	    gpio clear gpio212 && 
+	    usb reset &&
+	    ; done;
+
+	fi
+
+	EOF
+
+	# install mkimage tools
+	sudo apt-get -qq install u-boot-tools
+
+	sudo mkimage -C none -A arm -T script -d $BUILD_PATH/boot.cmd $OUTPUT_PATH/boot.scr
 
 
 } #CreateUsbFlashUpdate
