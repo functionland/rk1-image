@@ -21,7 +21,7 @@ jobs:
             uploadUrl = release;
           } catch (error) {
             console.log('Error fetching latest release: ', error.message);
-            uploadUrl = error.message;
+            uploadUrl = error;
           }
           return uploadUrl;
     - name: Print release upload URL
