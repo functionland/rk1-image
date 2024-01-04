@@ -4,19 +4,16 @@ on:
   workflow_dispatch:  # This allows you to manually trigger the workflow
 
 jobs:
-  get-release:
+  test:
     runs-on: ubuntu-latest
-
     steps:
-    - name: Check out repository
-      uses: actions/checkout@v2
-    - name: Get Release
-      id: get-release
-      uses: actions/github-script@v6
-      with:
-        script: |
-          const release = await github.repos.getLatestRelease({
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-          });
-          return release.data.upload_url;
+      - uses: actions/checkout@v2
+      - name: Set output
+        id: vars
+        run: echo "tag=${GITHUB_REF#refs/*/}" >> $GITHUB_OUTPUT
+      - name: Check output
+        env:
+          RELEASE_VERSION: ${{ steps.vars.outputs.tag }}
+        run: |
+          echo $RELEASE_VERSION
+          echo ${{ steps.vars.outputs.tag }}
