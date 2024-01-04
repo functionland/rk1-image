@@ -12,13 +12,13 @@ jobs:
       uses: actions/github-script@v5
       with:
         script: |
-          let uploadUrl = '';
+          let uploadUrl = 0;
           try {
             const release = await github.rest.repos.getLatestRelease({
              owner: context.repo.owner,
              repo: context.repo.repo,
             });
-            uploadUrl = release.data.upload_url;
+            uploadUrl = release.data.id;
           } catch (error) {
             console.log('Error fetching latest release: ', error.message);
           }
@@ -36,18 +36,11 @@ jobs:
       with:
           script: |
             const fs = require('fs');
-            const tag = context.ref.replace("refs/tags/", "");
-            // Get release for this tag
-            const release = await github.repos.getReleaseByTag({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              tag
-            });
             // Upload the release asset
             await github.repos.uploadReleaseAsset({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              release_id: release.data.id,
+              release_id: ${{ steps.get-release-info.outputs.result }},
               name: "app.zip",
               data: await fs.readFileSync("app.zip")
             });
