@@ -179,8 +179,10 @@ CreateUsbFlashUpdate()
 
 	EOF
 
-	for (( i=0; i<$fileCnt; i++ ))
-	do
+	#for (( i=0; i<$fileCnt; i++ ))
+	#do
+	i=0
+	while [ "$i" -lt $fileCnt ]; do
 		cat >> $BUILD_PATH/boot.cmd <<- EOF
 
 	    size usb 0:1 update.img.$i
@@ -195,6 +197,7 @@ CreateUsbFlashUpdate()
 	    echo "emmc: part $i copy completed"
 		
 		EOF
+		i=$(( i + 1 ))
 	done
 
 
