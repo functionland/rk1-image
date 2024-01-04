@@ -7,16 +7,25 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - name: Get Release
-      id: get-release
-      uses: actions/github-script@v6
-      with:
-        script: |
-          const release = await github.repos.getLatestRelease({
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-          });
-          return release.data.upload_url;
-    - name: Print release upload URL
-      run: echo "${{ steps.get-release.outputs.result }}"
+    - name: Get Release Info
+        id: get-release-info
+        uses: actions/github-script@v4
+        with:
+          script: |
+            const release = await github.rest.repos.getLatestRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+            });
+            return release.data.upload_url;
+      - name: Create dummy test.txt
+        run: echo "This is a test file" > ./test.txt
+      - name: Upload node Image to Release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.get-release-info.outputs.result }}
+          asset_path: ./test.txt
+          asset_name: test.txt
+          asset_content_type: application/octet-stream
 
