@@ -30,7 +30,7 @@ jobs:
     - name: Zip test.txt to test.zip
       run: zip test.zip test.txt
     - name: Upload node Image to Release
-      uses: actions/github-script@v4
+      uses: actions/github-script@v5
       env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
