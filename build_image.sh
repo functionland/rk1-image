@@ -11,7 +11,7 @@ Main() {
 
 	# read all variable from config file
 	source $DIR/config
-
+	
 	mkdir -p $BUILD_PATH
 
 	#download armbian src
@@ -49,7 +49,6 @@ ArmbianSrcInit()
 	#get armbian userpatches
 	cp -r $DIR/userpatches/ $ARMBIAN_PATH/userpatches/
 
-
 	# if [ -d $ARMBIAN_PATH/userpatches ]; then
 	# 	echo "update armbian userpatches repo"
 	# 	git -C $ARMBIAN_PATH/userpatches pull
@@ -58,7 +57,8 @@ ArmbianSrcInit()
 	# 	git clone --depth=1  https://github.com/mahdichi/armbian_userpatches $ARMBIAN_PATH/userpatches/
 	# fi
 
-
+	#copy config to overlay for access in chroot
+	cp $DIR/config $ARMBIAN_PATH/userpatches/overlay/
 
 } # ArmbianSrcInit
 ########################################################
