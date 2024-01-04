@@ -11,19 +11,17 @@ jobs:
       id: get-release-info
       uses: actions/github-script@v5
       with:
-          script: |
-            let uploadUrl = '';
-            try {
-              const release = await github.rest.repos.getLatestRelease({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-              });
-              uploadUrl = release.data.upload_url;
-            } catch (error) {
-              console.log('Error fetching latest release: ', error.message);
-              uploadUrl = error.message;
-            }
-            return uploadUrl;
+          let uploadUrl = '';
+          try {
+            const release = await github.rest.repos.getLatestRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+            });
+            uploadUrl = release.data.upload_url.replace(/\{\?name,label\}/, '');
+          } catch (error) {
+            console.log('Error fetching latest release: ', error.message);
+          }
+          return uploadUrl;
     - name: Print release upload URL
       run: echo "Upload URL is ${{ steps.get-release-info.outputs.result }}"
     - name: Create dummy test.txt
