@@ -6,7 +6,6 @@ DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BUILD_PATH=$DIR/build
 ARMBIAN_PATH=$BUILD_PATH/armbian-build
 ARMBIAN_IMAGE_PATH=$ARMBIAN_PATH/output/images
-OUTPUT_PATH=$DIR/output
 ########################################################
 Main() {
 
@@ -16,10 +15,10 @@ Main() {
 	mkdir -p $BUILD_PATH
 
 	#download armbian src
-	#ArmbianSrcInit;
+	ArmbianSrcInit;
 
 	#compile armbian
-	#ArmbianCompileServer;
+	ArmbianCompileServer;
 
 	CreateUsbFlashUpdate;
 
@@ -48,13 +47,18 @@ ArmbianSrcInit()
 	fi
 	
 	#get armbian userpatches
-	if [ -d $ARMBIAN_PATH/userpatches ]; then
-		echo "update armbian userpatches repo"
-		git -C $ARMBIAN_PATH/userpatches pull
-	else
-		echo "clone armbian userpatches repo"
-		git clone --depth=1  https://github.com/mahdichi/armbian_userpatches $ARMBIAN_PATH/userpatches/
-	fi
+	cp -r $DIR/userpatches/ $ARMBIAN_PATH/userpatches/
+
+
+	# if [ -d $ARMBIAN_PATH/userpatches ]; then
+	# 	echo "update armbian userpatches repo"
+	# 	git -C $ARMBIAN_PATH/userpatches pull
+	# else
+	# 	echo "clone armbian userpatches repo"
+	# 	git clone --depth=1  https://github.com/mahdichi/armbian_userpatches $ARMBIAN_PATH/userpatches/
+	# fi
+
+
 
 } # ArmbianSrcInit
 ########################################################
@@ -120,12 +124,12 @@ ArmbianCompileDesktop()
 CreateUsbFlashUpdate()
 {
 	echo "Create USB Flash Update files"
+	
+	echo "Split update file to 1GB parts"
+	split -d -a 1 -b 1G $ARMBIAN_IMAGE_PATH/*.img $BUILD_PATH/update.img. --verbose
 
-	mkdir -p $OUTPUT_PATH
-	#split -d -a 1 -b 1G $ARMBIAN_IMAGE_PATH/*.img $OUTPUT_PATH/update.img. --verbose
-
-	#create boot script 
-	fileCnt=$(ls -l $OUTPUT_PATH/update.img.* | wc -l)
+	echo "create boot script"
+	fileCnt=$(ls -l $BUILD_PATH/update.img.* | wc -l)
 	touch $BUILD_PATH/boot.cmd
 
 	cat > $BUILD_PATH/boot.cmd <<- EOF
@@ -220,10 +224,14 @@ CreateUsbFlashUpdate()
 
 	EOF
 
-	# install mkimage tools
+	# boot script
 	sudo apt-get -qq install u-boot-tools
+	mkimage -C none -A arm -T script -d $BUILD_PATH/boot.cmd $BUILD_PATH/boot.scr
 
-	sudo mkimage -C none -A arm -T script -d $BUILD_PATH/boot.cmd $OUTPUT_PATH/boot.scr
+	# tar output 
+	echo "tar all update file to $BUILD_PATH/update.tar"
+	cd $BUILD_PATH
+	tar -cvf update.tar update.img.* boot.scr
 
 
 } #CreateUsbFlashUpdate
