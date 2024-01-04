@@ -11,11 +11,12 @@ jobs:
       id: get-release-info
       uses: actions/github-script@v5
       with:
+        script: |
           let uploadUrl = '';
           try {
             const release = await github.rest.repos.getLatestRelease({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
+             owner: context.repo.owner,
+             repo: context.repo.repo,
             });
             uploadUrl = release.data.upload_url.replace(/\{\?name,label\}/, '');
           } catch (error) {
