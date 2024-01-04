@@ -9,7 +9,7 @@ jobs:
     steps:
     - name: Get Release
       id: get-release
-      uses: actions/github-script@v3
+      uses: actions/github-script@v4
       with:
         script: |
           const release = await github.repos.getLatestRelease({
