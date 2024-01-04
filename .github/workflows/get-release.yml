@@ -30,12 +30,25 @@ jobs:
     - name: Zip test.txt to test.zip
       run: zip test.zip test.txt
     - name: Upload node Image to Release
-      uses: actions/upload-release-asset@v1
+      uses: actions/github-script@v4
       env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-          upload_url: ${{ steps.get-release-info.outputs.result }}
-          asset_path: ./test.zip
-          asset_name: test.zip
-          asset_content_type: application/zip
+          script: |
+            const fs = require('fs');
+            const tag = context.ref.replace("refs/tags/", "");
+            // Get release for this tag
+            const release = await github.repos.getReleaseByTag({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              tag
+            });
+            // Upload the release asset
+            await github.repos.uploadReleaseAsset({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              release_id: release.data.id,
+              name: "app.zip",
+              data: await fs.readFileSync("app.zip")
+            });
 
