@@ -1,23 +1,68 @@
 #!/bin/sh
 
-ARMBIAN_BUILD_PATH=/media/ma/fx/armbian/armbian-build
-DOCKER_OFFLINE_PATH=$ARMBIAN_BUILD_PATH/userpatches/overlay/docker_offline/
+#rk1-image root dir
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+#all build done in this path
+BUILD_PATH=$DIR/build
+
+ARMBIAN_PATH=$BUILD_PATH/armbian-build
+
 ########################################################
 Main() {
-	#DockerOffline;
+
+	# read all variable from config file
+	source $DIR/config
+
+	mkdir -p $BUILD_PATH
+
+	#download armbian src
+	ArmbianSrcInit;
+
+	#compile armbian
 	ArmbianCompileServer;
+
+
 } # Main
 ########################################################
-ArmbianCloneRepo()
+ArmbianSrcInit()
 {
+	echo "install armbian required package"
+	# if docker dosn't exist install it
+	if ! command -v docker &> /dev/null
+	then
+		echo "installing docker"
+		curl -fsSL https://get.docker.com -o $BUILD_PATH/get-docker.sh
+		sudo sh $BUILD_PATH/get-docker.sh
+	fi
+
+	sudo apt-get -y -qq install git
+
+	#get armbian-biuld
+	if [ -d $ARMBIAN_PATH ]; then
+		echo "update armbian-build branch $ARMBIAN_REPO_BRANCH"
+		git -C $ARMBIAN_PATH pull
+	else
+		echo "clone armbian-build branch $ARMBIAN_REPO_BRANCH"
+		git clone --depth=1 --branch=$ARMBIAN_BRANCH https://github.com/armbian/build $ARMBIAN_PATH
+	fi
 	
-} # ArmbianCloneRepo
+	#get armbian userpatches
+	if [ -d $ARMBIAN_PATH/userpatches ]; then
+		echo "update armbian userpatches repo"
+		git -C $ARMBIAN_PATH/userpatches pull
+	else
+		echo "clone armbian userpatches repo"
+		git clone --depth=1  https://github.com/mahdichi/armbian_userpatches $ARMBIAN_PATH/userpatches/
+	fi
+
+} # ArmbianSrcInit
 ########################################################
 ArmbianCompileServer()
 {
 #https://docs.armbian.com/Developer-Guide_Build-Options/
 
-	$ARMBIAN_BUILD_PATH/compile.sh \
+	$ARMBIAN_PATH/compile.sh \
 	BOARD=fxblox-rk1 \
 	BRANCH=legacy \
 	RELEASE=jammy \
@@ -44,7 +89,7 @@ ArmbianCompileServer()
 ########################################################
 ArmbianCompileDesktop()
 {
-	$ARMBIAN_BUILD_PATH/compile.sh \
+	$ARMBIAN_PATH/compile.sh \
 	BOARD=fxblox-rk1 \
 	BRANCH=legacy \
 	BUILD_DESKTOP=yes \
@@ -71,14 +116,6 @@ ArmbianCompileDesktop()
 	#fula: logrotate
 
 } # ArmbianCompileDesktop
-########################################################
-DockerOffline()
-{
-	docker save functionland/node:release -o $DOCKER_OFFLINE_PATH/node_release.tar
-	docker save functionland/go-fula:release -o $DOCKER_OFFLINE_PATH/go_fula_release.tar
-	docker save functionland/fxsupport:release -o $DOCKER_OFFLINE_PATH/fxsupport_release.tar
-
-} # DockerOffline
 ########################################################
 
 Main "$@"
