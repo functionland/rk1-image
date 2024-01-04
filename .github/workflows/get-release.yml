@@ -9,12 +9,21 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+    - name: Get Release
+      uses: actions/github-script@v6
+      with:
+        script: |
+          let uploadUrl = '';
+          try {
+            const release = await github.rest.repos.getLatestRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+            });
+            uploadUrl = release.data.upload_url;
+          } catch (error) {
+            console.log('Error fetching latest release: ', error.message);
+          }
+          return uploadUrl;
+    - name: Print release upload URL
+      run: echo "Upload URL is ${{ steps.get-release.outputs.upload_url }}"
 
-      # steps for building assets
-      - run: echo "REPLACE ME!" > assets.txt
-
-      - uses: shogo82148/actions-upload-release-asset@v1
-        with:
-          upload_url: ${{ github.event.release.upload_url }}
-          asset_path: assets.txt
