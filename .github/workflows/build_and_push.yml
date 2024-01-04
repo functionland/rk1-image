@@ -30,7 +30,7 @@ jobs:
 
     - name: Get Release
       id: get-release
-      uses: actions/github-script@v3
+      uses: actions/github-script@v4
       with:
         script: |
           const release = await github.repos.getLatestRelease({
@@ -44,7 +44,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        upload_url: ${{ steps.get-release.outputs.upload_url }} # This pulls from the GET RELEASE step above
+        upload_url: ${{ steps.get-release.outputs.result }} # This pulls from the GET RELEASE step above
         asset_path: ./build/update.zip
         asset_name: update.zip
         asset_content_type: application/zip
