@@ -12,11 +12,17 @@ jobs:
       uses: actions/github-script@v4
       with:
           script: |
-            const release = await github.rest.repos.getLatestRelease({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-            });
-            return release.data.upload_url;
+            let uploadUrl = '';
+            try {
+              const release = await github.rest.repos.getLatestRelease({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+              });
+              uploadUrl = release.data.upload_url;
+            } catch (error) {
+              console.log('Error fetching latest release: ', error.message);
+            }
+            return uploadUrl;
     - name: Create dummy test.txt
       run: echo "This is a test file" > ./test.txt
     - name: Upload node Image to Release
