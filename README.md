@@ -12,7 +12,7 @@ sudo sh build_image.sh
 
 ### Image the FxBlox RK1
 
-1- Download the update.zip file attached to the latest [release](https://github.com/functionland/rk1-image/releases/latest)
+1- Download the update.zip file attached to the <b>Assets</b> section of the [latest release](https://github.com/functionland/rk1-image/releases/latest)
  
 2- Unzip it to the root of a USBC drive which is formatted as FAT32 (unzipped files Should be directly in the root) 
  
