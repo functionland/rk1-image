@@ -16,7 +16,7 @@ jobs:
     - name: Install Dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y git curl u-boot-tools ca-certificates gnupg
+        sudo apt-get install -y git curl u-boot-tools ca-certificates gnupg zip
 
     - name: Set up Python
       uses: actions/setup-python@v2
