@@ -47,6 +47,7 @@ ArmbianSrcInit()
 	fi
 	
 	#get armbian userpatches
+	rm -rf $ARMBIAN_PATH/userpatches/
 	cp -r $DIR/userpatches/ $ARMBIAN_PATH/userpatches/
 
 	# if [ -d $ARMBIAN_PATH/userpatches ]; then
