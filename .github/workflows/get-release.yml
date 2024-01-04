@@ -8,6 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Get Release
+      id: get-release
       uses: actions/github-script@v6
       with:
         script: |
@@ -17,7 +18,7 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
             });
-            uploadUrl = release.data;
+            uploadUrl = release;
           } catch (error) {
             console.log('Error fetching latest release: ', error.message);
           }
