@@ -52,6 +52,9 @@ fxBloxCustomScript()
 {
 	echo "fxBlox Custom Script"
 
+	# read all variable from config file
+	source $DIR/config
+
 	#fix blutooth frimware loading error
 	echo "fix blutooth"
 	ln -s /lib/firmware/rtl8852bu_config /lib/firmware/rtl_bt/rtl8852bu_config.bin
