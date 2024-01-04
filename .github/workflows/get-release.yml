@@ -9,7 +9,7 @@ jobs:
     steps:
     - name: Get Release Info
       id: get-release-info
-      uses: actions/github-script@v3
+      uses: actions/github-script@v5
       with:
           script: |
             let uploadUrl = '';
