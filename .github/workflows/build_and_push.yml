@@ -28,23 +28,36 @@ jobs:
         chmod +x ./build_image.sh
         bash ./build_image.sh
 
-    - name: Get Release
-      id: get-release
-      uses: actions/github-script@v4
+    - name: Get Release Info
+      id: get-release-info
+      uses: actions/github-script@v5
       with:
         script: |
-          const release = await github.repos.getLatestRelease({
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-          });
-          return release.data.upload_url;
-
-    - name: Upload to Release
-      uses: actions/upload-release-asset@v1
+          let uploadUrl = 0;
+          try {
+            const release = await github.rest.repos.getLatestRelease({
+             owner: context.repo.owner,
+             repo: context.repo.repo,
+            });
+            uploadUrl = release.data.id;
+          } catch (error) {
+            console.log('Error fetching latest release: ', error.message);
+          }
+          return uploadUrl;
+    - name: Print release upload URL
+      run: echo "Upload URL is ${{ steps.get-release-info.outputs.result }}"
+    - name: Upload node Image to Release
+      uses: actions/github-script@v5
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        upload_url: ${{ steps.get-release.outputs.result }} # This pulls from the GET RELEASE step above
-        asset_path: ./build/update.zip
-        asset_name: update.zip
-        asset_content_type: application/zip
+          script: |
+            const fs = require('fs');
+            // Upload the release asset
+            await github.rest.repos.uploadReleaseAsset({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              release_id: ${{ steps.get-release-info.outputs.result }},
+              name: "update.zip",
+              data: await fs.readFileSync("./build/update.zip")
+            });
