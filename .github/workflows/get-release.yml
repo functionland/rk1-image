@@ -22,6 +22,7 @@ jobs:
             } catch (error) {
               console.log('Error fetching latest release: ', error.message);
             }
+            echo "This is upload URL: ${{ uploadUrl }}"
             return uploadUrl;
     - name: Create dummy test.txt
       run: echo "This is a test file" > ./test.txt
