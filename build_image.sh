@@ -3,11 +3,10 @@
 #rk1-image root dir
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-#all build done in this path
 BUILD_PATH=$DIR/build
-
 ARMBIAN_PATH=$BUILD_PATH/armbian-build
-
+ARMBIAN_IMAGE_PATH=$ARMBIAN_PATH/output/images
+OUTPUT_PATH=$DIR/output
 ########################################################
 Main() {
 
@@ -17,11 +16,12 @@ Main() {
 	mkdir -p $BUILD_PATH
 
 	#download armbian src
-	ArmbianSrcInit;
+	#ArmbianSrcInit;
 
 	#compile armbian
-	ArmbianCompileServer;
+	#ArmbianCompileServer;
 
+	CreateUsbFlashUpdate;
 
 } # Main
 ########################################################
@@ -117,5 +117,22 @@ ArmbianCompileDesktop()
 
 } # ArmbianCompileDesktop
 ########################################################
+CreateUsbFlashUpdate()
+{
+	echo "Create USB Flash Update files"
 
+	mkdir -p $OUTPUT_PATH
+
+	#split -d -a 1 -b 1G $ARMBIAN_IMAGE_PATH/*.img $OUTPUT_PATH/update.img. --verbose
+
+	fileCnt=$(ls -l "update.img.*" | wc -l)
+
+	echo $fileCnt
+
+	touch $OUTPUT_PATH/boot.cmd
+
+
+
+} #CreateUsbFlashUpdate
+########################################################
 Main "$@"
