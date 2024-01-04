@@ -41,7 +41,7 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               release_id: ${{ steps.get-release-info.outputs.result }},
-              name: "app.zip",
-              data: await fs.readFileSync("app.zip")
+              name: "test.zip",
+              data: await fs.readFileSync("./test.zip")
             });
 
