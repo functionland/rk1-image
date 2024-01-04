@@ -9,21 +9,14 @@ jobs:
     steps:
     - name: Get Release
       id: get-release
-      uses: actions/github-script@v6
+      uses: actions/github-script@v3
       with:
         script: |
-          let uploadUrl = '';
-          try {
-            const release = await github.rest.repos.getLatestRelease({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-            });
-            uploadUrl = release.data.upload_url;
-          } catch (error) {
-            console.log('Error fetching latest release: ', error.message);
-            uploadUrl = error.message;
-          }
-          return uploadUrl;
+          const release = await github.repos.getLatestRelease({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+          });
+          return release.data.upload_url;
     - name: Print release upload URL
       run: echo "${{ steps.get-release.outputs.result }}"
 
