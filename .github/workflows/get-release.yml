@@ -22,8 +22,9 @@ jobs:
             } catch (error) {
               console.log('Error fetching latest release: ', error.message);
             }
-            echo "This is upload URL: ${{ uploadUrl }}"
             return uploadUrl;
+    - name: Print release upload URL
+      run: echo "Upload URL is ${{ steps.get-release-info.outputs.result }}"
     - name: Create dummy test.txt
       run: echo "This is a test file" > ./test.txt
     - name: Upload node Image to Release
