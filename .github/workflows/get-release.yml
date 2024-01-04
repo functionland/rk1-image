@@ -17,11 +17,11 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
             });
-            uploadUrl = release.data.upload_url;
+            uploadUrl = release.data;
           } catch (error) {
             console.log('Error fetching latest release: ', error.message);
           }
           return uploadUrl;
     - name: Print release upload URL
-      run: echo "Upload URL is ${{ steps.get-release.outputs.upload_url }}"
+      run: echo "${{ steps.get-release.outputs }}"
 
