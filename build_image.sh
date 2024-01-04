@@ -1,7 +1,7 @@
 #!/bin/sh
 
 #rk1-image root dir
-DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 
 BUILD_PATH=$DIR/build
 ARMBIAN_PATH=$BUILD_PATH/armbian-build
