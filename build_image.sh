@@ -235,8 +235,7 @@ CreateUsbFlashUpdate()
 	# tar output 
 	echo "tar all update file to $BUILD_PATH/update.tar"
 	cd $BUILD_PATH
-	tar -cvf update.tar update.img.* boot.scr
-
+	zip -r update.zip update.img.* boot.scr
 
 } #CreateUsbFlashUpdate
 ########################################################
