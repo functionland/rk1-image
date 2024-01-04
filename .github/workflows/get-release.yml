@@ -18,7 +18,7 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
             });
-            uploadUrl = release;
+            uploadUrl = release.data.upload_url;
           } catch (error) {
             console.log('Error fetching latest release: ', error.message);
           }
