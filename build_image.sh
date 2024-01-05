@@ -18,7 +18,8 @@ Main() {
 	ArmbianSrcInit;
 
 	#compile armbian
-	ArmbianCompileServer;
+	#ArmbianCompileServer;
+	ArmbianCompileDesktop;
 
 	CreateUsbFlashUpdate;
 
@@ -232,8 +233,8 @@ CreateUsbFlashUpdate()
 	sudo apt-get -qq install u-boot-tools
 	mkimage -C none -A arm -T script -d $BUILD_PATH/boot.cmd $BUILD_PATH/boot.scr
 
-	# tar output 
-	echo "tar all update file to $BUILD_PATH/update.tar"
+	# zip output 
+	echo "zip all update file to $BUILD_PATH/update.zip"
 	cd $BUILD_PATH
 	zip -r update.zip update.img.* boot.scr
 
