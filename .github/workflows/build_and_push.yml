@@ -21,7 +21,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
-        python-version: '3.x'  # Set up the Python version you need
+        python-version: '3.12.1'  # Set up the Python version you need
 
     - name: Run build script
       run: |
