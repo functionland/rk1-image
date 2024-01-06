@@ -7,7 +7,7 @@ The file can be used to image the FxBlox RK1.
 
 This part is <b>unnecessary</b> to image the FxBlox as the latest image is always available in the release section. this is just for developers who are interested in building an image themselves.
 ```shell
-sudo sh build_image.sh
+bash build_image.sh
 ```
 
 ### Image the FxBlox RK1
