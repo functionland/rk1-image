@@ -185,7 +185,7 @@ InstallFulaOTA()
 	mkdir -p /home/$ARMBIAN_USER_NAME
 	chown -R $ARMBIAN_USER_NAME:$ARMBIAN_USER_NAME /home/$ARMBIAN_USER_NAME
 
-	git clone -b auto-image https://github.com/functionland/fula-ota /home/$ARMBIAN_USER_NAME/fula-ota
+	git clone -b main https://github.com/functionland/fula-ota /home/$ARMBIAN_USER_NAME/fula-ota
 
 	#copy offline docker
 	#mkdir -p /usr/bin/fula/
