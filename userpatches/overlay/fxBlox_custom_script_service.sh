@@ -16,8 +16,8 @@ addUser()
 		echo "$password"
 	) | passwd "$RealUserName" > /dev/null 2>&1
 
-	# mkdir -p /home/$ARMBIAN_USER_NAME/
-	#chown -R "$RealUserName":"$RealUserName" /home/pi/
+	mkdir -p /home/$RealUserName/
+	chown -R "$RealUserName":"$RealUserName" /home/pi/
 
 	for additionalgroup in sudo netdev audio video disk tty users games dialout plugdev input bluetooth systemd-journal ssh; do
 		usermod -aG "${additionalgroup}" "${RealUserName}" 2> /dev/null
