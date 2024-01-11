@@ -18,8 +18,23 @@ Main() {
 	ArmbianSrcInit;
 
 	#compile armbian
-	#ArmbianCompileServer;
-	ArmbianCompileDesktop;
+	if [ -z "${1}" ]
+	then
+		echo "error No Image selected"
+		exit 1;
+	fi
+
+	if [ $1 = "server" ]
+	then
+		echo "Compile Server Image"
+		ArmbianCompileServer;
+	elif [ $1 = "desktop" ]
+	then
+		echo "Compile Desktop Image"
+		ArmbianCompileDesktop;
+	else
+		echo "error wrong Image selected"
+	fi
 
 	CreateUsbFlashUpdate;
 
