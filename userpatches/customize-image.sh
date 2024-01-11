@@ -60,73 +60,47 @@ fxBloxCustomScript()
 	ln -s /lib/firmware/rtl8852bu_config /lib/firmware/rtl_bt/rtl8852bu_config.bin
 	ln -s /lib/firmware/rtl8852bu_fw /lib/firmware/rtl_bt/rtl8852bu_fw.bin
 
-	CreatUser;
+	fxBloxCustomScriptService;
 
 	InstallpythonPackages;
-
+	
 	InstallDocker;
 	#InstallDockerOffline;
-
+	
 	InstallFulaOTA;
 
 } # fxBloxCustomScript
 
-CreatUser()
+fxBloxCustomScriptService()
 {
-	echo "Creat User"
+	echo "install fxBlox Custom Script Service"
 
 	rm /root/.not_logged_in_yet
-	export LANG=C LC_ALL="en_US.UTF-8"
 
-	# set root password
-	password=$ARMBIAN_ROOT_PASSWORD
-	(
-		echo "$password"
-		echo "$password"
-	) | passwd root > /dev/null 2>&1
+	mkdir -p /usr/bin/fula/
+	cp /tmp/overlay/config /usr/bin/fula/
 
+	touch /root/.fxBlox_custom_script_service
+	cp /tmp/overlay/fxBlox_custom_script_service.sh /usr/bin/fxBlox_custom_script_service.sh
+	chmod +x /usr/bin/fxBlox_custom_script_service.sh
 
-	# set shell
-	USER_SHELL="bash"
-	SHELL_PATH=$(grep "/$USER_SHELL$" /etc/shells | tail -1)
-	chsh -s "$(grep -iF "/$USER_SHELL" /etc/shells | tail -1)"
-	sed -i "s|^SHELL=.*|SHELL=${SHELL_PATH}|" /etc/default/useradd
-	sed -i "s|^DSHELL=.*|DSHELL=${SHELL_PATH}|" /etc/adduser.conf
+	touch /etc/systemd/system/fxBlox_custom_script_service.service
 
-	# create user
-	RealUserName=$ARMBIAN_USER_NAME
-	RealName=$ARMBIAN_USER_NAME
-	password=$ARMBIAN_USER_PASSWORD
+	cat > /etc/systemd/system/fxBlox_custom_script_service.service <<- EOF
+	[Unit]
+	Description=fxBlox_custom_script_service service
+	After=multi-user.target
 
-	adduser --quiet --disabled-password --home /home/"$RealUserName" --gecos "$RealName" "$RealUserName"
-	(
-		echo "$password"
-		echo "$password"
-	) | passwd "$RealUserName" > /dev/null 2>&1
+	[Service]
+	ExecStart=/bin/bash /usr/bin/fxBlox_custom_script_service.sh
+	Type=simple
 
-	mkdir -p /home/$ARMBIAN_USER_NAME/
-	#chown -R "$RealUserName":"$RealUserName" /home/pi/
+	[Install]
+	WantedBy=multi-user.target
+	EOF
+	systemctl --no-reload enable fxBlox_custom_script_service.service
 
-	for additionalgroup in sudo netdev audio video disk tty users games dialout plugdev input bluetooth systemd-journal ssh; do
-		usermod -aG "${additionalgroup}" "${RealUserName}" 2> /dev/null
-	done
-
-	# fix for gksu in Xenial
-	touch /home/"$RealUserName"/.Xauthority
-	chown "$RealUserName":"$RealUserName" /home/"$RealUserName"/.Xauthority
-	RealName="$(awk -F":" "/^${RealUserName}:/ {print \$5}" < /etc/passwd | cut -d',' -f1)"
-	[ -z "$RealName" ] && RealName="$RealUserName"
-	#echo -e "\nDear \e[0;92m${RealName}\x1B[0m, your account \e[0;92m${RealUserName}\x1B[0m has been created and is sudo enabled."
-	#echo -e "Please use this account for your daily work from now on.\n"
-	rm -f /root/.not_logged_in_yet
-	chmod +x /etc/update-motd.d/*
-	# set up profile sync daemon on desktop systems
-	if command -v psd > /dev/null 2>&1; then
-		echo -e "${RealUserName} ALL=(ALL) NOPASSWD: /usr/bin/psd-overlay-helper" >> /etc/sudoers
-		touch /home/"${RealUserName}"/.activate_psd
-		chown "$RealUserName":"$RealUserName" /home/"${RealUserName}"/.activate_psd
-	fi
-} # CreatUser
+} # fxBloxCustomScriptService
 
 InstallpythonPackages()
 {
@@ -183,7 +157,7 @@ InstallFulaOTA()
 	echo "Install Fula OTA"
 
 	mkdir -p /home/$ARMBIAN_USER_NAME
-	chown -R $ARMBIAN_USER_NAME:$ARMBIAN_USER_NAME /home/$ARMBIAN_USER_NAME
+	#chown -R $ARMBIAN_USER_NAME:$ARMBIAN_USER_NAME /home/$ARMBIAN_USER_NAME
 
 	git clone -b main https://github.com/functionland/fula-ota /home/$ARMBIAN_USER_NAME/fula-ota
 
