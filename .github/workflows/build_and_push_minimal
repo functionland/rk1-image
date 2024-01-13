@@ -1,0 +1,80 @@
+name: Build and Upload
+
+on: 
+  workflow_dispatch:  # This allows you to manually trigger the workflow
+  release:
+    types: [published]  # This triggers the workflow when a release is published
+
+jobs:
+  build-and-upload:
+    runs-on: self-hosted
+
+    steps:
+    - name: Check out repository
+      uses: actions/checkout@v2
+
+    - name: Install Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y git curl u-boot-tools ca-certificates gnupg zip
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.x'  # Set up the Python version you need
+
+    - name: Run build script
+      run: |
+        chmod +x ./build_image.sh
+        bash ./build_image.sh desktop
+
+    - name: Get Release Info
+      id: get-release-info
+      uses: actions/github-script@v5
+      with:
+        script: |
+          let uploadUrl = 0;
+          try {
+            const release = await github.rest.repos.getLatestRelease({
+             owner: context.repo.owner,
+             repo: context.repo.repo,
+            });
+            uploadUrl = release.data.id;
+          } catch (error) {
+            console.log('Error fetching latest release: ', error.message);
+          }
+          return uploadUrl;
+    - name: Print release upload URL
+      run: echo "Upload URL is ${{ steps.get-release-info.outputs.result }}"
+      
+    - name: Upload update file to Release
+      uses: actions/github-script@v5
+      env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+          script: |
+            const fs = require('fs');
+            // Upload the release asset
+            await github.rest.repos.uploadReleaseAsset({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              release_id: ${{ steps.get-release-info.outputs.result }},
+              name: "update_minimal.zip",
+              data: await fs.readFileSync("./build/update.zip")
+            });
+            
+    - name: Upload full image to Release
+      uses: actions/github-script@v5
+      env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+          script: |
+            const fs = require('fs');
+            // Upload the release asset
+            await github.rest.repos.uploadReleaseAsset({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              release_id: ${{ steps.get-release-info.outputs.result }},
+              name: "fula_armbian_minimal.img",
+              data: await fs.readFileSync("./build/Armbian-unofficial_23.11.0-trunk_Fxblox-rk1_jammy_legacy_5.10.160_minimal.img")
+            });
