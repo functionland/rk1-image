@@ -44,7 +44,7 @@ sudo apt install flashrom
 download firmware with this command
 
 ```bash
-wget ???
+wget https://github.com/functionland/rk1-image/raw/main/firmware/RK1_SPI_flash_firmware.bin
 ```
 
 now write firmware to SPI flash with this command
