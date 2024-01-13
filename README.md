@@ -40,5 +40,6 @@ https://github.com/functionland/rk1-image/assets/6176518/06ddf8ed-61a0-4031-b48d
 
 https://github.com/functionland/rk1-image/assets/6176518/71d42e46-1cc8-4ab7-b573-a11eeaea3289
 
-
+### update USB Type-C firmware
+RK1 USB buttom is a full-feature USB Type-C and it has USB2, USB3, Display Port Output and charger port.for enabling all feature we must update its flash firmware manually.for more info see this [link](firmware/README.md)
 
