@@ -47,34 +47,60 @@ jobs:
     - name: Print release upload URL
       run: echo "Upload URL is ${{ steps.get-release-info.outputs.result }}"
       
-    - name: Upload update file to Release
+    - name: Split Update File into Parts
+      run: |
+        # Split 'update.zip' into parts if it's large
+        zip -s 1.99g -r build/update_minimal.zip build/update.zip
+
+    - name: Upload Split Update File Parts to Release
       uses: actions/github-script@v5
       env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-          script: |
-            const fs = require('fs');
-            // Upload the release asset
-            await github.rest.repos.uploadReleaseAsset({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              release_id: ${{ steps.get-release-info.outputs.result }},
-              name: "update_minimal.zip",
-              data: await fs.readFileSync("./build/update.zip")
-            });
+        script: |
+          const fs = require('fs');
+          const path = require('path');
+          const directory = './build';
+          const files = fs.readdirSync(directory);
+          for (const file of files) {
+            if (file.startsWith('update_minimal') && file.endsWith('.zip')) {
+              const filePath = path.join(directory, file);
+              console.log(`Uploading ${file}...`);
+              await github.rest.repos.uploadReleaseAsset({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                release_id: ${{ steps.get-release-info.outputs.result }},
+                name: file,
+                data: fs.readFileSync(filePath)
+              });
+            }
+          }
             
-    - name: Upload full image to Release
+    - name: Split Full Image File into Parts
+      run: |
+        # Assuming 'build/Armbian.img' is your large file
+        zip -s 1.99g -r build/fullimage_minimal.zip build/Armbian-unofficial_23.11.0-trunk_Fxblox-rk1_jammy_legacy_5.10.160_minimal.img
+
+    - name: Upload Full Image parts to Release
       uses: actions/github-script@v5
       env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-          script: |
-            const fs = require('fs');
-            // Upload the release asset
-            await github.rest.repos.uploadReleaseAsset({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              release_id: ${{ steps.get-release-info.outputs.result }},
-              name: "fula_armbian_minimal.img",
-              data: await fs.readFileSync("./build/Armbian-unofficial_23.11.0-trunk_Fxblox-rk1_jammy_legacy_5.10.160_minimal.img")
-            });
+        script: |
+          const fs = require('fs');
+          const path = require('path');
+          const directory = './build';
+          const files = fs.readdirSync(directory);
+          for (const file of files) {
+            if (file.startsWith('fullimage_minimal') && file.endsWith('.zip')) {
+              const filePath = path.join(directory, file);
+              console.log(`Uploading ${file}...`);
+              await github.rest.repos.uploadReleaseAsset({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                release_id: ${{ steps.get-release-info.outputs.result }},
+                name: file,
+                data: fs.readFileSync(filePath)
+              });
+            }
+          }
