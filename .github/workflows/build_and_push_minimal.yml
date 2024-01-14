@@ -79,7 +79,7 @@ jobs:
     - name: Split Full Image File into Parts
       run: |
         # Assuming 'build/Armbian.img' is your large file
-        zip -s 1.99g -r build/fullimage_minimal.zip build/Armbian-unofficial_23.11.0-trunk_Fxblox-rk1_jammy_legacy_5.10.160_minimal.img
+        zip -s 1900m -r build/fullimage_minimal.zip build/Armbian-unofficial_23.11.0-trunk_Fxblox-rk1_jammy_legacy_5.10.160_minimal.img
 
     - name: Upload Full Image parts to Release
       uses: actions/github-script@v5
