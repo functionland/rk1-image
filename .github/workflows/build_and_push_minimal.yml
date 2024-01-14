@@ -50,7 +50,7 @@ jobs:
     - name: Split Update File into Parts
       run: |
         # Split 'update.zip' into parts if it's large
-        zip -s 1.99g -r build/update_minimal.zip build/update.zip
+        zip -s 1900m -r build/update_minimal.zip build/update.zip
 
     - name: Upload Split Update File Parts to Release
       uses: actions/github-script@v5
