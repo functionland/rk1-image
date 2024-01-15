@@ -46,13 +46,8 @@ jobs:
           return uploadUrl;
     - name: Print release upload URL
       run: echo "Upload URL is ${{ steps.get-release-info.outputs.result }}"
-      
-    - name: Split Update File into Parts
-      run: |
-        # Split 'update.zip' into parts if it's large
-        split -b 1900m build/update.zip build/update_minimal.zip.part-
 
-    - name: Upload Split Update File Parts to Release
+    - name: Upload Update File Parts to Release
       uses: actions/github-script@v5
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -63,7 +58,7 @@ jobs:
           const directory = './build';
           const files = fs.readdirSync(directory);
           for (const file of files) {
-            if (file.startsWith('update_minimal.zip.part-')) {
+            if (file.startsWith('update')) {
               const filePath = path.join(directory, file);
               console.log(`Uploading ${file}...`);
               await github.rest.repos.uploadReleaseAsset({
@@ -78,7 +73,7 @@ jobs:
             
     - name: Zip Full Image File
       run: |
-        img_file=$(ls build/*.img | head -n 1)
+        img_file=$(ls build/armbian-build/output/images/*.img | head -n 1)
         if [ -n "$img_file" ]; then
           # Split 'Armbian.img' into parts if it's large
           zip -s 1900m -r "build/fullimage_minimal.zip" "$img_file"
