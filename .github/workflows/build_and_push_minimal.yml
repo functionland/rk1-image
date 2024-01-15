@@ -65,7 +65,7 @@ jobs:
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 release_id: ${{ steps.get-release-info.outputs.result }},
-                name: file,
+                name: `minimal_${file}`,
                 data: fs.readFileSync(filePath)
               });
             }
