@@ -69,8 +69,6 @@ jobs:
                 data: fs.readFileSync(filePath)
               });
             }
-            console.log(`Deleting ${file}...`);
-            fs.unlinkSync(filePath);
           }
             
     - name: Zip Full Image File
