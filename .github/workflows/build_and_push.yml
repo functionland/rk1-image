@@ -46,18 +46,26 @@ jobs:
           return uploadUrl;
     - name: Print release upload URL
       run: echo "Upload URL is ${{ steps.get-release-info.outputs.result }}"
-    - name: Upload node Image to Release
+    - name: Upload Update File Parts to Release
       uses: actions/github-script@v5
       env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-          script: |
-            const fs = require('fs');
-            // Upload the release asset
-            await github.rest.repos.uploadReleaseAsset({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              release_id: ${{ steps.get-release-info.outputs.result }},
-              name: "update.zip",
-              data: await fs.readFileSync("./build/update.zip")
-            });
+        script: |
+          const fs = require('fs');
+          const path = require('path');
+          const directory = './build';
+          const files = fs.readdirSync(directory);
+          for (const file of files) {
+            if (file.startsWith('update')) {
+              const filePath = path.join(directory, file);
+              console.log(`Uploading ${file}...`);
+              await github.rest.repos.uploadReleaseAsset({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                release_id: ${{ steps.get-release-info.outputs.result }},
+                name: file,
+                data: fs.readFileSync(filePath)
+              });
+            }
+          }
