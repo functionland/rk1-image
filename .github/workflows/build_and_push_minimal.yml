@@ -26,7 +26,7 @@ jobs:
     - name: Run build script
       run: |
         chmod +x ./build_image.sh
-        bash ./build_image.sh desktop
+        bash ./build_image.sh server
 
     - name: Get Release Info
       id: get-release-info
