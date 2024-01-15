@@ -58,7 +58,7 @@ jobs:
           const directory = './build';
           const files = fs.readdirSync(directory);
           for (const file of files) {
-            if (file.startsWith('update')) {
+            if (file.startsWith('update.z')) {
               const filePath = path.join(directory, file);
               console.log(`Uploading ${file}...`);
               await github.rest.repos.uploadReleaseAsset({
@@ -69,6 +69,8 @@ jobs:
                 data: fs.readFileSync(filePath)
               });
             }
+            console.log(`Deleting ${file}...`);
+            fs.unlinkSync(filePath);
           }
             
     - name: Zip Full Image File
@@ -93,7 +95,7 @@ jobs:
           const directory = './build';
           const files = fs.readdirSync(directory);
           for (const file of files) {
-            if (file.startsWith('fullimage_minimal')) {
+            if (file.startsWith('fullimage_minimal.z')) {
               const filePath = path.join(directory, file);
               console.log(`Uploading ${file}...`);
               await github.rest.repos.uploadReleaseAsset({
