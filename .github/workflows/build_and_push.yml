@@ -57,7 +57,7 @@ jobs:
           const directory = './build';
           const files = fs.readdirSync(directory);
           for (const file of files) {
-            if (file.startsWith('update')) {
+            if (file.startsWith('update.z')) {
               const filePath = path.join(directory, file);
               console.log(`Uploading ${file}...`);
               await github.rest.repos.uploadReleaseAsset({
