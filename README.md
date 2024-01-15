@@ -19,8 +19,8 @@ bash build_image.sh desktop
 ### Image the FxBlox RK1
 
 1- Download the `update.zip` files attached to the <b>Assets</b> section of the [latest release](https://github.com/functionland/rk1-image/releases/latest) 
-- Only all the ones either without minimal_ or with minimal_ and not both. minimal_ does not have the desktop and GUI available and can be accessed with Terminal only but is much smaller.
-- Due to the Github size limit the file might be separated into a multi-part zip. Download all files to the same folder and you should be able to unzip with any software)
+- Only all the ones either without `minimal_` or with `minimal_` and not both. `minimal_` does not have the desktop and GUI available and can be accessed with Terminal only but is much smaller.
+- Due to the Github size limit the file might be separated into a multi-part zip. Download all files to the same folder and you should be able to unzip with any software
  
 2- Unzip it to the root of a USBC drive which is formatted as FAT32 (unzipped files Should be directly in the root) 
  
