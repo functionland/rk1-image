@@ -6,6 +6,7 @@ The file can be used to image the FxBlox RK1.
 ### Run
 - Required: No
 - Technical level: 6/10
+  
 This part is <b>unnecessary</b> to image the FxBlox as the latest image is always available in the release section. this is just for developers who are interested in building an image themselves.
 
 for building server images without Desktop GUI run this command.
@@ -54,5 +55,6 @@ https://github.com/functionland/rk1-image/assets/6176518/71d42e46-1cc8-4ab7-b573
 ### update USB Type-C firmware
 - Required: No
 - Technical level: 7/10
+  
 RK1 bottom USB is a full-feature USB Type-C with USB2, USB3, Display Port Output and charger port. For enabling all features we must update its flash firmware manually. For more info see this [link](firmware/README.md)
 
