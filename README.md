@@ -22,7 +22,7 @@ bash build_image.sh desktop
 - Required: Yes
 - Technical level: 2/10
 
-1- Download the `minimal_update.zip` and `minimal_update.z1` files attached to the <b>Assets</b> section of the [latest release](https://github.com/functionland/rk1-image/releases/latest) to the same folder on your computer
+1- Download the `minimal_update.zip` file attached to the <b>Assets</b> section of the [latest release](https://github.com/functionland/rk1-image/releases/latest) to a folder on your computer
 - Only all the ones either without `minimal_` or with `minimal_` and not both. `minimal_` does not have the desktop and GUI available and can be accessed with Terminal but is much smaller. If you need a desktop, download the ones without the `minimal` prefix
 - Due to the GitHub size limit the file might be separated into a multi-part zip. Download all files to the same folder and you should be able to unzip with any software
  
