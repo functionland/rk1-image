@@ -171,6 +171,9 @@ InstallFulaOTA()
 	#disable resize rootfs
 	touch /usr/bin/fula/.resize_flg
 
+ 	#Mark installation as completed
+	touch /home/$ARMBIAN_USER_NAME/V6.info
+
 	#automount
 	cp /home/$ARMBIAN_USER_NAME/fula-ota/docker/fxsupport/linux/automount.sh /usr/local/bin/automount.sh
 	chmod +x /usr/local/bin/automount.sh
