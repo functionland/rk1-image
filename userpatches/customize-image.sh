@@ -166,7 +166,7 @@ InstallFulaOTA()
 	#cp /tmp/overlay/offline_docker/* /usr/bin/fula/
 
 	cd /home/$ARMBIAN_USER_NAME/fula-ota/docker/fxsupport/linux
-	bash ./fula.sh install chroot
+	bash /home/$ARMBIAN_USER_NAME/fula-ota/docker/fxsupport/linux/fula.sh install chroot
 
 	#disable resize rootfs
 	touch /usr/bin/fula/.resize_flg
