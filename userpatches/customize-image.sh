@@ -61,12 +61,12 @@ fxBloxCustomScript()
 	ln -s /lib/firmware/rtl8852bu_fw /lib/firmware/rtl_bt/rtl8852bu_fw.bin
 
  	# Increase UDP buffer size
-	sysctl -w net.core.rmem_default=2097152
-	sysctl -w net.core.rmem_max=2097152
+	sysctl -w net.core.rmem_default=2500000
+	sysctl -w net.core.rmem_max=2500000
 	
 	# Optionally, you might want to increase the send buffer size as well
-	sysctl -w net.core.wmem_default=2097152
-	sysctl -w net.core.wmem_max=2097152
+	sysctl -w net.core.wmem_default=2500000
+	sysctl -w net.core.wmem_max=2500000
 
 	fxBloxCustomScriptService;
 
