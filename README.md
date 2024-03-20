@@ -9,7 +9,7 @@ The file can be used to image the FxBlox RK1.
   
 This part is <b>unnecessary</b> to image the FxBlox as the latest image is always available in the release section. this is just for developers who are interested in building an image themselves.
 
-First you need to install docker on the machine.
+First you need to install docker on the machine and docker should be avaialbe for the currently logged-in user without the need for sudo.
 
 for building server images without Desktop GUI run this command.
 ```shell
