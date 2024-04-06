@@ -251,6 +251,7 @@ CreateUsbFlashUpdate()
 	# zip output 
 	echo "zip all update file to $BUILD_PATH/update.zip"
 	cd $BUILD_PATH
+ 	sudo rm -f update.zip
 	zip -s 1900m -r update.zip update.img.* boot.scr
 
 } #CreateUsbFlashUpdate
