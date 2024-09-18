@@ -23,6 +23,15 @@ jobs:
       with:
         python-version: '3.x'  # Set up the Python version you need
 
+    - name: Remove existing build folder
+      run: |
+        if [ -d "build" ]; then
+          echo "Removing existing build folder"
+          rm -rf build
+        else
+          echo "No existing build folder found"
+        fi
+        
     - name: Run build script
       run: |
         chmod +x ./build_image.sh
