@@ -85,7 +85,7 @@ ArmbianCompileServer()
 
 	$ARMBIAN_PATH/compile.sh \
 	BOARD=fxblox-rk1 \
-	BRANCH=legacy \
+	BRANCH=vendor \
 	RELEASE=jammy \
 	BUILD_DESKTOP=no \
 	BUILD_MINIMAL=yes \
@@ -113,7 +113,7 @@ ArmbianCompileDesktop()
 {
 	$ARMBIAN_PATH/compile.sh \
 	BOARD=fxblox-rk1 \
-	BRANCH=legacy \
+	BRANCH=vendor \
 	BUILD_DESKTOP=yes \
 	BUILD_MINIMAL=no \
 	DESKTOP_APPGROUPS_SELECTED='3dsupport browsers chat desktop_tools editors email internet multimedia office remote_desktop' \
