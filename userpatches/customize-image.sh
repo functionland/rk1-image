@@ -83,6 +83,7 @@ fxBloxCustomScriptService()
 	touch /root/.fxBlox_custom_script_service
 	cp /tmp/overlay/fxBlox_custom_script_service.sh /usr/bin/fxBlox_custom_script_service.sh
 	chmod +x /usr/bin/fxBlox_custom_script_service.sh
+	chmod 755 /usr/bin/fxBlox_custom_script_service.sh
 
 	touch /etc/systemd/system/fxBlox_custom_script_service.service
 
@@ -92,6 +93,7 @@ fxBloxCustomScriptService()
 	After=multi-user.target
 
 	[Service]
+	User=root
 	ExecStart=/bin/bash /usr/bin/fxBlox_custom_script_service.sh
 	Type=simple
 
@@ -106,9 +108,16 @@ InstallpythonPackages()
 {
 	echo "Install python Packages"
 
-	pip install RPi.GPIO
-	pip install pexpect
-	pip install psutil
+	sudo apt-get install -y python3-pip
+	sudo apt-get install -y mergerfs
+	sudo apt-get install -y inotify-tools
+	sudo apt-get install -y python3-dbus
+	sudo apt-get install -y python3-rpi.gpio
+	sudo apt-get install -y python3-pexpect
+	sudo apt-get install -y python3-requests
+	sudo apt-get install -y python3-psutil
+	sudo apt-get install -y logrotate
+
 } # InstallpythonPackages
 
 InstallDocker()
