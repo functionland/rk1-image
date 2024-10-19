@@ -51,6 +51,7 @@ Install()
 fxBloxCustomScript()
 {
 	echo "fxBlox Custom Script"
+	apt-get update
 
 	# read all variable from config file
 	source /tmp/overlay/config

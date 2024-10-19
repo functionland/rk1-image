@@ -2,8 +2,6 @@ name: Build and Upload
 
 on: 
   workflow_dispatch:  # This allows you to manually trigger the workflow
-  release:
-    types: [published]  # This triggers the workflow when a release is published
 
 jobs:
   build-and-upload:
