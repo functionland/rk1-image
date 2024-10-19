@@ -94,7 +94,7 @@ ArmbianCompileServer()
 	KERNEL_GIT=shallow \
 	CONSOLE_AUTOLOGIN=yes \
 	EXPERT="yes" \
-	CLEAN_LEVEL=oldcache,images,debs,alldebs,cache,sources,extras \
+	CLEAN_LEVEL=oldcache \
  	NETWORKING_STACK=network-manager \
 	PACKAGE_LIST_BOARD="\
 	cmake libi2c-dev \
