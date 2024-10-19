@@ -86,7 +86,7 @@ ArmbianCompileServer()
 	$ARMBIAN_PATH/compile.sh \
 	BOARD=fxblox-rk1 \
 	INCLUDE_HOME_DIR=no \
-	BRANCH=current \
+	BRANCH=legacy \
 	RELEASE=jammy \
 	BUILD_DESKTOP=no \
 	BUILD_MINIMAL=yes \
