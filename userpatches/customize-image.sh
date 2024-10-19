@@ -125,25 +125,27 @@ InstallDocker()
 	echo "installing docker"
 
 	#Add Docker's official GPG key:
-	for pkg in docker.io docker-doc docker-compose docker-compose-v2 podman-docker containerd runc; do apt remove $pkg; done
+	for pkg in docker.io docker-doc docker-compose docker-compose-v2 podman-docker containerd runc; do apt-get remove $pkg; done
 	#apt-get update
-	apt install ca-certificates curl gnupg
+	# Add Docker's official GPG key:
+	apt-get update
+	apt-get install ca-certificates curl
 	install -m 0755 -d /etc/apt/keyrings
-	curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-	chmod a+r /etc/apt/keyrings/docker.gpg
+	curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+	chmod a+r /etc/apt/keyrings/docker.asc
 
 	# Add the repository to Apt sources:
 	echo \
-	  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
-	  $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
-	  tee /etc/apt/sources.list.d/docker.list > /dev/null
-	apt update
+	"deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+	$(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+	tee /etc/apt/sources.list.d/docker.list > /dev/null
+	apt-get update
 
-	apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+	apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
 	#Install Docker Compose 1.29.2
 	echo "Docker Compose"
-	curl -L "https://github.com/docker/compose/releases/download/v2.16.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+	curl -SL https://github.com/docker/compose/releases/download/v2.29.6/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose
 	chmod +x /usr/local/bin/docker-compose
 	ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
 } # InstallDocker

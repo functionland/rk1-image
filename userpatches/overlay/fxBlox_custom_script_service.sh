@@ -45,6 +45,8 @@ addUser()
 if [[ -f /root/.fxBlox_custom_script_service ]]; then
 
 	rm -f /root/.fxBlox_custom_script_service
+	sudo systemctl stop docker.socket
+	sudo systemctl stop docker.service
 
 	# read variable from config file
 	source /usr/bin/fula/config
@@ -250,6 +252,9 @@ if [[ -f /root/.fxBlox_custom_script_service ]]; then
 			printf "\e[0;91mPlease reboot the system now \x1B[0m \n\n"
 		fi
 	fi
+
+	sudo systemctl start docker.socket
+	sudo systemctl start docker.service
 
 	reboot
 fi
