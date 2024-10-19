@@ -108,15 +108,15 @@ InstallpythonPackages()
 {
 	echo "Install python Packages"
 
-	sudo apt-get install -y python3-pip
-	sudo apt-get install -y mergerfs
-	sudo apt-get install -y inotify-tools
-	sudo apt-get install -y python3-dbus
-	sudo apt-get install -y python3-rpi.gpio
-	sudo apt-get install -y python3-pexpect
-	sudo apt-get install -y python3-requests
-	sudo apt-get install -y python3-psutil
-	sudo apt-get install -y logrotate
+	apt-get install -y python3-pip
+	apt-get install -y mergerfs
+	apt-get install -y inotify-tools
+	apt-get install -y python3-dbus
+	apt-get install -y python3-rpi.gpio
+	apt-get install -y python3-pexpect
+	apt-get install -y python3-requests
+	apt-get install -y python3-psutil
+	apt-get install -y logrotate
 
 } # InstallpythonPackages
 
