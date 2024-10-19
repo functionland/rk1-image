@@ -85,7 +85,8 @@ ArmbianCompileServer()
 
 	$ARMBIAN_PATH/compile.sh \
 	BOARD=fxblox-rk1 \
-	BRANCH=vendor \
+	INCLUDE_HOME_DIR=no \
+	BRANCH=current \
 	RELEASE=jammy \
 	BUILD_DESKTOP=no \
 	BUILD_MINIMAL=yes \
@@ -93,7 +94,7 @@ ArmbianCompileServer()
 	KERNEL_GIT=shallow \
 	CONSOLE_AUTOLOGIN=yes \
 	EXPERT="yes" \
-	CLEAN_LEVEL=oldcache \
+	CLEAN_LEVEL=oldcache,images,debs,alldebs,cache,sources,extras \
  	NETWORKING_STACK=network-manager \
 	PACKAGE_LIST_BOARD="\
 	cmake libi2c-dev \
