@@ -48,6 +48,10 @@ if [[ -f /root/.fxBlox_custom_script_service ]]; then
 	sleep 1
 	sudo systemctl stop docker.service
 	sleep 1
+	sudo systemctl stop uniondrive.service
+	sleep 1
+	sudo systemctl stop fula.service
+	sleep 1
 	# read variable from config file
 	source /usr/bin/fula/config
 
@@ -257,6 +261,10 @@ if [[ -f /root/.fxBlox_custom_script_service ]]; then
 	sleep 1
 	sudo systemctl start docker.service
 	sleep 1
+	sudo systemctl start uniondrive.service
+	sleep 1
+	sudo systemctl start fula.service
+	sleep
 	rm -f /root/.fxBlox_custom_script_service
 	sync
 	sleep 1
