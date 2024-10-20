@@ -95,6 +95,7 @@ fxBloxCustomScriptService()
 
 	[Service]
 	User=root
+	Group=root
 	ExecStart=/bin/bash /usr/bin/fxBlox_custom_script_service.sh
 	Type=simple
 
