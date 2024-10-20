@@ -108,6 +108,7 @@ fxBloxCustomScriptService()
 InstallpythonPackages()
 {
 	echo "Install python Packages"
+	apt-get update
 
 	apt-get install -y python3-pip
 	apt-get install -y mergerfs
