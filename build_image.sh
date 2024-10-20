@@ -12,6 +12,9 @@ Main() {
 	# read all variable from config file
 	source $DIR/config
 	
+	if [ -d $BUILD_PATH ]; then
+		rm -rf "$BUILD_PATH"
+	fi
 	mkdir -p $BUILD_PATH
 
 	#download armbian src
@@ -55,12 +58,11 @@ ArmbianSrcInit()
 
 	#get armbian-biuld
 	if [ -d $ARMBIAN_PATH ]; then
-		echo "update armbian-build branch $ARMBIAN_REPO_BRANCH"
-		git -C $ARMBIAN_PATH pull
-	else
-		echo "clone armbian-build branch $ARMBIAN_REPO_BRANCH"
-		git clone --depth=1 --branch=$ARMBIAN_BRANCH https://github.com/armbian/build $ARMBIAN_PATH
+		rm -rf "$ARMBIAN_PATH"
 	fi
+
+	echo "clone armbian-build branch $ARMBIAN_REPO_BRANCH"
+	git clone --depth=1 --branch=$ARMBIAN_BRANCH https://github.com/armbian/build $ARMBIAN_PATH
 	
 	#get armbian userpatches
 	rm -rf $ARMBIAN_PATH/userpatches/
