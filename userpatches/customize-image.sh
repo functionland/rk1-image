@@ -89,18 +89,21 @@ fxBloxCustomScriptService()
 	touch /etc/systemd/system/fxBlox_custom_script_service.service
 
 	cat > /etc/systemd/system/fxBlox_custom_script_service.service <<- EOF
-	[Unit]
-	Description=fxBlox_custom_script_service service
-	After=multi-user.target
+[Unit]
+Description=fxBlox custom script service
+After=multi-user.target network.target
+ConditionPathExists=/root/.fxBlox_custom_script_service
 
-	[Service]
-	User=root
-	Group=root
-	ExecStart=/bin/bash /usr/bin/fxBlox_custom_script_service.sh
-	Type=simple
+[Service]
+Type=oneshot
+User=root
+Group=root
+ExecStart=/bin/bash /usr/bin/fxBlox_custom_script_service.sh
+RemainAfterExit=yes
+TimeoutStartSec=infinity
 
-	[Install]
-	WantedBy=multi-user.target
+[Install]
+WantedBy=multi-user.target
 	EOF
 	systemctl --no-reload enable fxBlox_custom_script_service.service
 
