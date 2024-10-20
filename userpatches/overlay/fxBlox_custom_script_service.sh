@@ -43,15 +43,6 @@ addUser()
 
 
 if [[ -f /root/.fxBlox_custom_script_service ]]; then
-
-	sudo systemctl stop docker.socket
-	sleep 1
-	sudo systemctl stop docker.service
-	sleep 1
-	sudo systemctl stop uniondrive.service
-	sleep 1
-	sudo systemctl stop fula.service
-	sleep 1
 	# read variable from config file
 	source /usr/bin/fula/config
 
@@ -257,14 +248,8 @@ if [[ -f /root/.fxBlox_custom_script_service ]]; then
 		fi
 	fi
 
-	sudo systemctl start docker.socket
-	sleep 1
-	sudo systemctl start docker.service
-	sleep 1
-	sudo systemctl start uniondrive.service
-	sleep 1
-	sudo systemctl start fula.service
-	sleep
+	usermod -aG docker your-username
+
 	rm -f /root/.fxBlox_custom_script_service
 	sync
 	sleep 1
