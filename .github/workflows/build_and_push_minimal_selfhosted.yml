@@ -1,4 +1,4 @@
-name: Build and Upload Minimal Image
+name: Build and Upload Minimal Image Self Hosted
 
 on: 
   workflow_dispatch:  # This allows you to manually trigger the workflow
