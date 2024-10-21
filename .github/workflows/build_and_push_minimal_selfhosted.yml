@@ -1,0 +1,114 @@
+name: Build and Upload Minimal Image
+
+on: 
+  workflow_dispatch:  # This allows you to manually trigger the workflow
+
+jobs:
+  build-and-upload:
+    runs-on: self-hosted
+
+    steps:
+    - name: Check out repository
+      uses: actions/checkout@v2
+
+    - name: Install Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y git curl u-boot-tools ca-certificates gnupg zip
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.x'  # Set up the Python version you need
+
+    - name: Remove existing build folder
+      run: |
+        if [ -d "build" ]; then
+          echo "Removing existing build folder"
+          rm -rf build
+        else
+          echo "No existing build folder found"
+        fi
+        
+    - name: Run build script
+      run: |
+        chmod +x ./build_image.sh
+        bash ./build_image.sh server
+
+    - name: Get Release Info
+      id: get-release-info
+      uses: actions/github-script@v5
+      with:
+        script: |
+          let uploadUrl = 0;
+          try {
+            const release = await github.rest.repos.getLatestRelease({
+             owner: context.repo.owner,
+             repo: context.repo.repo,
+            });
+            uploadUrl = release.data.id;
+          } catch (error) {
+            console.log('Error fetching latest release: ', error.message);
+          }
+          return uploadUrl;
+    - name: Print release upload URL
+      run: echo "Upload URL is ${{ steps.get-release-info.outputs.result }}"
+
+    - name: Upload Update File Parts to Release
+      uses: actions/github-script@v5
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        script: |
+          const fs = require('fs');
+          const path = require('path');
+          const directory = './build';
+          const files = fs.readdirSync(directory);
+          for (const file of files) {
+            if (file.startsWith('update.z')) {
+              const filePath = path.join(directory, file);
+              console.log(`Uploading ${file}...`);
+              await github.rest.repos.uploadReleaseAsset({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                release_id: ${{ steps.get-release-info.outputs.result }},
+                name: `minimal_${file}`,
+                data: fs.readFileSync(filePath)
+              });
+            }
+          }
+            
+    - name: Zip Full Image File
+      run: |
+        img_file=$(ls build/armbian-build/output/images/*.img | head -n 1)
+        if [ -n "$img_file" ]; then
+          # Split 'Armbian.img' into parts if it's large
+          zip -s 1900m -r "build/fullimage_minimal.zip" "$img_file"
+        else
+          echo "No .img file found in build directory."
+          exit 1
+        fi
+
+    - name: Upload Full Image parts to Release
+      uses: actions/github-script@v5
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        script: |
+          const fs = require('fs');
+          const path = require('path');
+          const directory = './build';
+          const files = fs.readdirSync(directory);
+          for (const file of files) {
+            if (file.startsWith('fullimage_minimal.z')) {
+              const filePath = path.join(directory, file);
+              console.log(`Uploading ${file}...`);
+              await github.rest.repos.uploadReleaseAsset({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                release_id: ${{ steps.get-release-info.outputs.result }},
+                name: `minimal_${file}`,
+                data: fs.readFileSync(filePath)
+              });
+            }
+          }
