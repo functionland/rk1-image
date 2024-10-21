@@ -248,7 +248,7 @@ if [[ -f /root/.fxBlox_custom_script_service ]]; then
 		fi
 	fi
 
-	usermod -aG docker your-username
+	usermod -aG docker "$RealUserName"
 
 	rm -f /root/.fxBlox_custom_script_service
 	sync
