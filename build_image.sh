@@ -62,7 +62,7 @@ ArmbianSrcInit()
 	fi
 
 	echo "clone armbian-build branch $ARMBIAN_REPO_BRANCH"
-	git clone --depth=1 --branch=$ARMBIAN_BRANCH https://github.com/functionland/build $ARMBIAN_PATH
+	git clone --depth=1 --branch=$ARMBIAN_BRANCH https://github.com/armbian/build $ARMBIAN_PATH
 	
 	#get armbian userpatches
 	rm -rf $ARMBIAN_PATH/userpatches/
@@ -87,8 +87,9 @@ ArmbianCompileServer()
 
 	$ARMBIAN_PATH/compile.sh \
 	BOARD=fxblox-rk1 \
-	BRANCH=legacy \
+	BRANCH=vendor \
 	RELEASE=jammy \
+	EXTRAWIFI=yes \
 	BUILD_DESKTOP=no \
 	BUILD_MINIMAL=yes \
 	KERNEL_CONFIGURE=no \
