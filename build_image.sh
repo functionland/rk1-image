@@ -92,7 +92,7 @@ ArmbianCompileServer()
 	EXTRAWIFI=yes \
 	BUILD_DESKTOP=no \
 	BUILD_MINIMAL=yes \
-	KERNEL_CONFIGURE=no \
+	KERNEL_CONFIGURE=yes \
 	KERNEL_GIT=shallow \
 	CONSOLE_AUTOLOGIN=yes \
 	EXPERT="yes" \
@@ -104,7 +104,7 @@ ArmbianCompileServer()
 	logrotate python3-pip mergerfs inotify-tools python3-dbus dnsmasq-base \
 	python3-dev python-is-python3 python3-pip python3-gi python3-gi-cairo gir1.2-gtk-3.0 dnsmasq-base lshw  \
 	debhelper build-essential ntfs-3g fakeroot lockfile-progs \
-	libip6tc2 libnftnl11 iptables \
+	libip6tc2 libnftnl11 iptables firmware-realtek \
 	" \
 	#usbmount: ebhelper build-essential ntfs-3g fakeroot lockfile-progs
 	#docker:   libip6tc2 libnftnl11 iptables
