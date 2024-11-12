@@ -62,8 +62,7 @@ ArmbianSrcInit()
 	# fi
 
 	echo "clone armbian-build branch $ARMBIAN_REPO_BRANCH"
-	#git clone --depth=1 --branch=$ARMBIAN_BRANCH https://github.com/armbian/build $ARMBIAN_PATH
-	git clone --depth=1 --branch=$ARMBIAN_BRANCH https://github.com/functionland/armbian-build $ARMBIAN_PATH
+	git clone --depth=1 --branch=$ARMBIAN_BRANCH https://github.com/armbian/build $ARMBIAN_PATH
 	
 	#get armbian userpatches
 	rm -rf $ARMBIAN_PATH/userpatches/
