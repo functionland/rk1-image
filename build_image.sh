@@ -12,9 +12,9 @@ Main() {
 	# read all variable from config file
 	source $DIR/config
 	
-	if [ -d $BUILD_PATH ]; then
-		rm -rf "$BUILD_PATH"
-	fi
+	# if [ -d $BUILD_PATH ]; then
+	# 	rm -rf "$BUILD_PATH"
+	# fi
 	mkdir -p $BUILD_PATH
 
 	#download armbian src
@@ -56,13 +56,14 @@ ArmbianSrcInit()
 
 	sudo apt-get -y -qq install git
 
-	#get armbian-biuld
-	if [ -d $ARMBIAN_PATH ]; then
-		rm -rf "$ARMBIAN_PATH"
-	fi
+	#get armbian-build
+	# if [ -d $ARMBIAN_PATH ]; then
+	# 	rm -rf "$ARMBIAN_PATH"
+	# fi
 
 	echo "clone armbian-build branch $ARMBIAN_REPO_BRANCH"
-	git clone --depth=1 --branch=$ARMBIAN_BRANCH https://github.com/armbian/build $ARMBIAN_PATH
+	#git clone --depth=1 --branch=$ARMBIAN_BRANCH https://github.com/armbian/build $ARMBIAN_PATH
+	git clone --depth=1 --branch=$ARMBIAN_BRANCH https://github.com/functionland/armbian-build $ARMBIAN_PATH
 	
 	#get armbian userpatches
 	rm -rf $ARMBIAN_PATH/userpatches/
@@ -193,10 +194,10 @@ CreateUsbFlashUpdate()
 	    echo "usb: there is update file"
 
 	    #turn on red led
-	    gpio clear gpio211
+	    gpio clear gpio411
 
 	    #turn off blue led
-	    gpio set gpio212
+	    gpio set gpio412
 
 	EOF
 
@@ -232,15 +233,15 @@ CreateUsbFlashUpdate()
 	    echo "******************************************"
 
 	    #turn off red led
-	    gpio set gpio211
+	    gpio set gpio411
 
 	    #turn on blue led
-	    gpio clear gpio212	
+	    gpio clear gpio412	
 
 	    while true ; do ; 
-	    gpio set gpio212 && 
+	    gpio set gpio412 && 
 	    usb reset &&
-	    gpio clear gpio212 && 
+	    gpio clear gpio412 && 
 	    usb reset &&
 	    ; done;
 

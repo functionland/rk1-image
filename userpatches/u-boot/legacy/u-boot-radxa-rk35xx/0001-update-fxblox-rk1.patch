@@ -1,0 +1,57 @@
+From 6d44aa1747ac8545fdde9050fbe150b9322d83ad Mon Sep 17 00:00:00 2001
+From: mahdichi <mahdichi@gmail.com>
+Date: Sat, 9 Nov 2024 20:27:08 +0330
+Subject: [PATCH] update fxblox-rk1
+
+---
+ arch/arm/dts/rk3588-fxblox-rk1.dts  | 1 -
+ configs/fxblox-rk1-rk3588_defconfig | 8 +++++---
+ 2 files changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/arch/arm/dts/rk3588-fxblox-rk1.dts b/arch/arm/dts/rk3588-fxblox-rk1.dts
+index ac598ed..3e91cf9 100644
+--- a/arch/arm/dts/rk3588-fxblox-rk1.dts
++++ b/arch/arm/dts/rk3588-fxblox-rk1.dts
+@@ -15,7 +15,6 @@
+ 
+ 	chosen {
+ 		stdout-path = &uart2;
+-		u-boot,spl-boot-order = &spi_nor, &sdmmc, &sdhci, &spi_nand;
+ 	};
+ 
+ 	vcc12v_dcin: vcc12v-dcin {
+diff --git a/configs/fxblox-rk1-rk3588_defconfig b/configs/fxblox-rk1-rk3588_defconfig
+index da7dd82..cb2c357 100644
+--- a/configs/fxblox-rk1-rk3588_defconfig
++++ b/configs/fxblox-rk1-rk3588_defconfig
+@@ -32,9 +32,9 @@ CONFIG_SPL_LOAD_FIT=y
+ CONFIG_SPL_FIT_IMAGE_POST_PROCESS=y
+ CONFIG_SPL_FIT_HW_CRYPTO=y
+ # CONFIG_SPL_SYS_DCACHE_OFF is not set
+-CONFIG_BOOTDELAY=1
++CONFIG_BOOTDELAY=3
+ # CONFIG_DISABLE_CONSOLE=y
+-# CONFIG_SYS_CONSOLE_INFO_QUIET=y
++CONFIG_SYS_CONSOLE_INFO_QUIET=y
+ # CONFIG_DISPLAY_CPUINFO is not set
+ CONFIG_ANDROID_BOOTLOADER=y
+ CONFIG_ANDROID_AVB=y
+@@ -73,7 +73,7 @@ CONFIG_CMD_SPI=y
+ CONFIG_CMD_USB=y
+ CONFIG_CMD_USB_MASS_STORAGE=y
+ # CONFIG_CMD_ITEST is not set
+-# CONFIG_CMD_SETEXPR is not set
++CONFIG_CMD_SETEXPR=y
+ CONFIG_CMD_TFTPPUT=y
+ CONFIG_CMD_TFTP_BOOTM=y
+ CONFIG_CMD_TFTP_FLASH=y
+@@ -216,3 +216,5 @@ CONFIG_AVB_LIBAVB_USER=y
+ CONFIG_RK_AVB_LIBAVB_USER=y
+ CONFIG_OPTEE_CLIENT=y
+ CONFIG_OPTEE_V2=y
++CONFIG_CMD_GPIO=y
++CONFIG_CMD_MD5SUM=y
+\ No newline at end of file
+-- 
+2.34.1
+
