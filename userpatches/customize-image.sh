@@ -57,9 +57,9 @@ fxBloxCustomScript()
 	source /tmp/overlay/config
 		
 	#fix blutooth frimware loading error
-	echo "fix blutooth"
-	ln -s /lib/firmware/rtl8852bu_config /lib/firmware/rtl_bt/rtl8852bu_config.bin
-	ln -s /lib/firmware/rtl8852bu_fw /lib/firmware/rtl_bt/rtl8852bu_fw.bin
+	# echo "fix blutooth"
+	# ln -s /lib/firmware/rtl8852bu_config /lib/firmware/rtl_bt/rtl8852bu_config.bin
+	# ln -s /lib/firmware/rtl8852bu_fw /lib/firmware/rtl_bt/rtl8852bu_fw.bin
 
 	fxBloxCustomScriptService;
 
@@ -76,7 +76,40 @@ fxBloxCustomScriptService()
 {
 	echo "install fxBlox Custom Script Service"
 
-	rm /root/.not_logged_in_yet
+	display_alert "$BOARD" "preset configs for rootfs" "info"
+
+	# Set PRESET_NET_CHANGE_DEFAULTS to 1 to apply any network related settings below
+	echo "PRESET_NET_CHANGE_DEFAULTS=0" > "${SDCARD}"/root/.not_logged_in_yet
+
+	# Country code to enable power ratings and channels for your country. eg: GB US DE | https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2
+	echo "PRESET_NET_WIFI_COUNTRYCODE='GB'" >> /root/.not_logged_in_yet
+
+	# Preset user default shell, you can choose bash or  zsh
+	echo "PRESET_USER_SHELL=bash" >> /root/.not_logged_in_yet
+
+	# Set PRESET_CONNECT_WIRELESS=y if you want to connect wifi manually at first login
+	echo "PRESET_CONNECT_WIRELESS=n" >> /root/.not_logged_in_yet
+
+	# Set SET_LANG_BASED_ON_LOCATION=n if you want to choose "Set user language based on your location?" with "n" at first login
+	echo "SET_LANG_BASED_ON_LOCATION=y" >> /root/.not_logged_in_yet
+
+	# Preset default locale
+	echo "PRESET_LOCALE=en_US.UTF-8" >> /root/.not_logged_in_yet
+
+	# Preset timezone
+	echo "PRESET_TIMEZONE=Etc/UTC" >> /root/.not_logged_in_yet
+
+	# Preset root password
+	echo "PRESET_ROOT_PASSWORD=${ARMBIAN_ROOT_PASSWORD}" >> /root/.not_logged_in_yet
+
+	# Preset username
+	echo "PRESET_USER_NAME=${ARMBIAN_USER_NAME}" >> /root/.not_logged_in_yet
+
+	# Preset user password
+	echo "PRESET_USER_PASSWORD=${ARMBIAN_USER_PASSWORD}" >> /root/.not_logged_in_yet
+
+	# Preset user default realname
+	echo "PRESET_DEFAULT_REALNAME=${ARMBIAN_USER_NAME}" >> /root/.not_logged_in_yet
 
 	mkdir -p /usr/bin/fula/
 	cp /tmp/overlay/config /usr/bin/fula/
