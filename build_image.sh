@@ -195,21 +195,21 @@ CreateUsbFlashUpdate()
 	mmc list
 	mmc dev
 
-	fatload usb 0:1 ${load_addr0} flash.img
-	echo "usb: flash image size: ${filesize} bytes"
+	fatload usb 0:1 \${load_addr0} flash.img
+	echo "usb: flash image size: \${filesize} bytes"
 	
-	setexpr file_size_blk ${filesize} / 0x200
-	echo "mtd: flash image block size: ${file_size_blk}"	
+	setexpr file_size_blk \${filesize} / 0x200
+	echo "mtd: flash image block size: \${file_size_blk}"	
 
-	mtd_blk read ${load_addr1} 0 ${file_size_blk}
+	mtd_blk read \${load_addr1} 0 \${file_size_blk}
 
-	setexpr cmp_size ${filesize} / 4 
-	echo "cmp: cmp size: ${cmp_size}"
+	setexpr cmp_size \${filesize} / 4 
+	echo "cmp: cmp size: \${cmp_size}"
 
 	echo "cmp: compare usb flash.img with mtd content"	
-	cmp ${load_addr0} ${load_addr1} ${cmp_size}
+	cmp \${load_addr0} \${load_addr1} \${cmp_size}
 
-	if test $? -eq 0 ; then
+	if test \$? -eq 0 ; then
 		echo "******************************************"
 		echo "usb: flash already updated"
 		echo "******************************************"
@@ -225,7 +225,7 @@ CreateUsbFlashUpdate()
 			gpio set gpio212
 
 			echo "mtd: wait for copy flash image to Nor Flash"
-			mtd_blk write ${load_addr0} 0 ${file_size_blk}
+			mtd_blk write \${load_addr0} 0 \${file_size_blk}
 			echo "mtd: copy completed"
 
 			rkimgtest mtd 2
