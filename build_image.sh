@@ -241,7 +241,7 @@ CreateUsbFlashUpdate()
 		fi
 	fi
 
-	echo "update rootfs
+	echo "update rootfs"
 
 	if test -e usb 0:1 update.img.0 ; then
 	    echo "******************************************"
