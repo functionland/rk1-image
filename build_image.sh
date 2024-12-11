@@ -6,15 +6,16 @@ DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 BUILD_PATH=$DIR/build
 ARMBIAN_PATH=$BUILD_PATH/armbian-build
 ARMBIAN_IMAGE_PATH=$ARMBIAN_PATH/output/images
+BOOTLOADER_IMAGE_PATH=$ARMBIAN_PATH/cache/sources/u-boot-worktree/u-boot-rockchip64/next-dev-v2024.03/
 ########################################################
 Main() {
 
 	# read all variable from config file
 	source $DIR/config
 	
-	if [ -d $BUILD_PATH ]; then
-		rm -rf "$BUILD_PATH"
-	fi
+	# if [ -d $BUILD_PATH ]; then
+	# 	rm -rf "$BUILD_PATH"
+	# fi
 	mkdir -p $BUILD_PATH
 
 	#download armbian src
@@ -56,10 +57,10 @@ ArmbianSrcInit()
 
 	sudo apt-get -y -qq install git
 
-	#get armbian-biuld
-	if [ -d $ARMBIAN_PATH ]; then
-		rm -rf "$ARMBIAN_PATH"
-	fi
+	#get armbian-build
+	# if [ -d $ARMBIAN_PATH ]; then
+	# 	rm -rf "$ARMBIAN_PATH"
+	# fi
 
 	echo "clone armbian-build branch $ARMBIAN_REPO_BRANCH"
 	git clone --depth=1 --branch=$ARMBIAN_BRANCH https://github.com/armbian/build $ARMBIAN_PATH
@@ -145,6 +146,9 @@ ArmbianCompileDesktop()
 CreateUsbFlashUpdate()
 {
 	echo "Create USB Flash Update files"
+
+	echo "copy bootloader to output folder"
+	cp $BOOTLOADER_IMAGE_PATH/rkspi_loader.img $BUILD_PATH/flash.img
 	
 	echo "Split update file to 1GB parts"
 	split -d -a 1 -b 1G $ARMBIAN_IMAGE_PATH/*.img $BUILD_PATH/update.img. --verbose
@@ -158,8 +162,9 @@ CreateUsbFlashUpdate()
 	echo "usb update starting"
 	echo "******************************************"
 
-	setenv load_addr "0x9000000"
-	setenv load_size "0x40000000"
+	setenv load_addr0 "0x09000000"
+	setenv load_addr1 "0x0B000000"
+	setenv load_size  "0x40000000"
 
 	setenv load_addr_part_0 "0x0000000"
 	setenv load_addr_part_1 "0x0200000"
@@ -185,8 +190,58 @@ CreateUsbFlashUpdate()
 	usb reset
 	usb dev 0
 
+	mtd_blk dev 2
+
 	mmc list
 	mmc dev
+
+	fatload usb 0:1 \${load_addr0} flash.img
+	echo "usb: flash image size: \${filesize} bytes"
+	
+	setexpr file_size_blk \${filesize} / 0x200
+	echo "mtd: flash image block size: \${file_size_blk}"	
+
+	mtd_blk read \${load_addr1} 0 \${file_size_blk}
+
+	setexpr cmp_size \${filesize} / 4 
+	echo "cmp: cmp size: \${cmp_size}"
+
+	echo "cmp: compare usb flash.img with mtd content"	
+	cmp \${load_addr0} \${load_addr1} \${cmp_size}
+
+	if test \$? -eq 0 ; then
+		echo "******************************************"
+		echo "usb: flash already updated"
+		echo "******************************************"
+	else
+		if test -e usb 0:1 flash.img ; then
+			echo "******************************************"
+			echo "usb: there is flash update file"
+
+			#turn on red led
+			gpio clear gpio211
+
+			#turn off blue led
+			gpio set gpio212
+
+			echo "mtd: wait for copy flash image to Nor Flash"
+			mtd_blk write \${load_addr0} 0 \${file_size_blk}
+			echo "mtd: copy completed"
+
+			rkimgtest mtd 2
+
+			echo " "
+			echo "please remove USB"
+			echo ""
+			echo "******************************************"
+		else
+			echo "******************************************"
+			echo "usb: there is no flash update file"
+			echo "******************************************"
+		fi
+	fi
+
+	echo "update rootfs"
 
 	if test -e usb 0:1 update.img.0 ; then
 	    echo "******************************************"
@@ -194,29 +249,28 @@ CreateUsbFlashUpdate()
 
 	    #turn on red led
 	    gpio clear gpio211
+		gpio clear gpio411
 
 	    #turn off blue led
 	    gpio set gpio212
-
+		gpio set gpio412
 	EOF
 
-	#for (( i=0; i<$fileCnt; i++ ))
-	#do
 	i=0
 	while [ "$i" -lt $fileCnt ]; do
 		cat >> $BUILD_PATH/boot.cmd <<- EOF
 
 	    size usb 0:1 update.img.$i
-	    echo "usb: part $i image size: \${filesize} bytes"	
+	    echo "usb: part $i image size: \${filesize} bytes"
 	    echo "usb: wait for copy part $i image to DDR"
-	    fatload usb 0:1 \${load_addr} update.img.$i
-	    echo "usb: part $i copy complete"	
+	    fatload usb 0:1 \${load_addr0} update.img.$i
+	    echo "usb: part $i copy complete"
 	    setexpr file_size_blk \${filesize} / 0x200
-	    echo "emmc: part $i image block size: \${file_size_blk}"	
+	    echo "emmc: part $i image block size: \${file_size_blk}"
 	    echo "emmc: wait for copy part $i image to eMMC"
-	    mmc write \${load_addr} \${load_addr_part_$i} \${file_size_blk}
+	    mmc write \${load_addr0} \${load_addr_part_$i} \${file_size_blk}
 	    echo "emmc: part $i copy completed"
-		
+
 		EOF
 		i=$(( i + 1 ))
 	done
@@ -233,14 +287,18 @@ CreateUsbFlashUpdate()
 
 	    #turn off red led
 	    gpio set gpio211
+		gpio set gpio411
 
 	    #turn on blue led
-	    gpio clear gpio212	
+	    gpio clear gpio212
+		gpio clear gpio412
 
-	    while true ; do ; 
-	    gpio set gpio212 && 
+	    while true ; do ;
+	    gpio set gpio212 &&
+		gpio set gpio412 &&
 	    usb reset &&
-	    gpio clear gpio212 && 
+	    gpio clear gpio212 &&
+		gpio clear gpio412 &&
 	    usb reset &&
 	    ; done;
 
@@ -256,7 +314,7 @@ CreateUsbFlashUpdate()
 	echo "zip all update file to $BUILD_PATH/update.zip"
 	cd $BUILD_PATH
  	sudo rm -f update.zip
-	zip -s 1900m -r update.zip update.img.* boot.scr
+	zip -s 1900m -r update.zip update.img.* boot.scr flash.img
 
 } #CreateUsbFlashUpdate
 ########################################################

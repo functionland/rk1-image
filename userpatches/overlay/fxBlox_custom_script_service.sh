@@ -1,56 +1,13 @@
 #!/bin/bash
 
-
-addUser()
-{
-	echo "Creat User"
-
-	# create user
-	RealUserName=$ARMBIAN_USER_NAME
-	RealName=$ARMBIAN_USER_NAME
-	password=$ARMBIAN_USER_PASSWORD
-
-	adduser --quiet --disabled-password --home /home/"$RealUserName" --gecos "$RealName" "$RealUserName"
-	(
-		echo "$password"
-		echo "$password"
-	) | passwd "$RealUserName" > /dev/null 2>&1
-
-	mkdir -p /home/$RealUserName/
-	chown -R "$RealUserName":"$RealUserName" /home/"$RealUserName"/
-
-	for additionalgroup in sudo netdev audio video disk tty users games dialout plugdev input bluetooth systemd-journal ssh; do
-		usermod -aG "${additionalgroup}" "${RealUserName}" 2> /dev/null
-	done
-
-	# fix for gksu in Xenial
-	touch /home/"$RealUserName"/.Xauthority
-	chown "$RealUserName":"$RealUserName" /home/"$RealUserName"/.Xauthority
-	RealName="$(awk -F":" "/^${RealUserName}:/ {print \$5}" < /etc/passwd | cut -d',' -f1)"
-	[ -z "$RealName" ] && RealName="$RealUserName"
-	#echo -e "\nDear \e[0;92m${RealName}\x1B[0m, your account \e[0;92m${RealUserName}\x1B[0m has been created and is sudo enabled."
-	#echo -e "Please use this account for your daily work from now on.\n"
-	rm -f /root/.not_logged_in_yet
-	chmod +x /etc/update-motd.d/*
-	# set up profile sync daemon on desktop systems
-	if command -v psd > /dev/null 2>&1; then
-		echo -e "${RealUserName} ALL=(ALL) NOPASSWD: /usr/bin/psd-overlay-helper" >> /etc/sudoers
-		touch /home/"${RealUserName}"/.activate_psd
-		chown "$RealUserName":"$RealUserName" /home/"${RealUserName}"/.activate_psd
-	fi
-} # addUser
-
-
-
 if [[ -f /root/.fxBlox_custom_script_service ]]; then
 	# read variable from config file
 	source /usr/bin/fula/config
 
-
 	# disable autologin
-	rm -f /etc/systemd/system/getty@.service.d/override.conf
-	rm -f /etc/systemd/system/serial-getty@.service.d/override.conf
-	systemctl daemon-reload
+	# rm -f /etc/systemd/system/getty@.service.d/override.conf
+	# rm -f /etc/systemd/system/serial-getty@.service.d/override.conf
+	# systemctl daemon-reload
 
 	declare desktop_dm="none"
 	declare -i desktop_is_sddm=0 desktop_is_lightdm=0 desktop_is_gdm3=0
@@ -81,13 +38,15 @@ if [[ -f /root/.fxBlox_custom_script_service ]]; then
 		setfont /usr/share/consolefonts/Uni3-TerminusBold32x16.psf.gz
 	fi
 
-	clear
+	#set shell
+	USER_SHELL="bash"
 
-	echo -e "Welcome to \e[1m\e[97m${VENDOR}\x1B[0m! \n"
-	echo -e "Documentation: \e[1m\e[92m${VENDORDOCS}\x1B[0m | Community support: \e[1m\e[92m${VENDORSUPPORT}\x1B[0m\n"
-	GET_IP=$(bash /etc/update-motd.d/30-armbian-sysinfo | grep IP | sed "s/.*IP://" | sed 's/^[ \t]*//')
-	[[ -n "$GET_IP" ]] && echo -e "IP address: $GET_IP\n"
+	SHELL_PATH=$(grep "/$USER_SHELL$" /etc/shells | tail -1)
+	chsh -s "$(grep -iF "/$USER_SHELL" /etc/shells | tail -1)"
 
+	# change shell for future users
+	sed -i "s|^SHELL=.*|SHELL=${SHELL_PATH}|" /etc/default/useradd
+	sed -i "s|^DSHELL=.*|DSHELL=${SHELL_PATH}|" /etc/adduser.conf
 
 	# set root password
 	password=$ARMBIAN_ROOT_PASSWORD
@@ -97,33 +56,50 @@ if [[ -f /root/.fxBlox_custom_script_service ]]; then
 	) | passwd root > /dev/null 2>&1
 
 
-	# set shell
-	USER_SHELL="bash"
-	SHELL_PATH=$(grep "/$USER_SHELL$" /etc/shells | tail -1)
-	chsh -s "$(grep -iF "/$USER_SHELL" /etc/shells | tail -1)"
-	sed -i "s|^SHELL=.*|SHELL=${SHELL_PATH}|" /etc/default/useradd
-	sed -i "s|^DSHELL=.*|DSHELL=${SHELL_PATH}|" /etc/adduser.conf
 
+	# create user
+	RealUserName=$ARMBIAN_USER_NAME
+	RealName=$ARMBIAN_USER_NAME
+	password=$ARMBIAN_USER_PASSWORD
 
-	addUser;
+	adduser --quiet --disabled-password --home /home/"$RealUserName" --gecos "$RealName" "$RealUserName"
+	(
+		echo "$password"
+		echo "$password"
+	) | passwd "$RealUserName" > /dev/null 2>&1
 
+	mkdir -p /home/$RealUserName/
+	chown -R "$RealUserName":"$RealUserName" /home/"$RealUserName"/
 
-	#set_timezone_and_locales;
+	for additionalgroup in sudo netdev audio video disk tty users games dialout plugdev input bluetooth systemd-journal ssh render docker; do
+		usermod -aG "${additionalgroup}" "${RealUserName}" 2> /dev/null
+	done
 
-
-	# if [[ ${USER_SHELL} == zsh ]]; then
-	# 	printf "\nYou selected \e[0;91mZSH\x1B[0m as your default shell. If you want to use it right away, please logout and login! \n\n"
-	# fi
+	# fix for gksu in Xenial
+	touch /home/"$RealUserName"/.Xauthority
+	chown "$RealUserName":"$RealUserName" /home/"$RealUserName"/.Xauthority
+	RealName="$(awk -F":" "/^${RealUserName}:/ {print \$5}" < /etc/passwd | cut -d',' -f1)"
+	[ -z "$RealName" ] && RealName="$RealUserName"
+	echo -e "\nDear \e[0;92m${RealName}\x1B[0m, your account \e[0;92m${RealUserName}\x1B[0m has been created and is sudo enabled."
+	echo -e "Please use this account for your daily work from now on.\n"
+	rm -f /root/.not_logged_in_yet
+	chmod +x /etc/update-motd.d/*
+	# set up profile sync daemon on desktop systems
+	if command -v psd > /dev/null 2>&1; then
+		echo -e "${RealUserName} ALL=(ALL) NOPASSWD: /usr/bin/psd-overlay-helper" >> /etc/sudoers
+		touch /home/"${RealUserName}"/.activate_psd
+		chown "$RealUserName":"$RealUserName" /home/"${RealUserName}"/.activate_psd
+	fi
 
 	# re-enable passing locale environment via ssh
 	sed -e '/^#AcceptEnv LANG/ s/^#//' -i /etc/ssh/sshd_config
 	# restart sshd daemon
-	systemctl reload ssh.service
+	systemctl restart ssh.service
+
 
 	# rpardini: hacks per-dm, very much legacy stuff that works by a miracle
 	if [[ "${desktop_dm}" == "lightdm" ]] && [ -n "$RealName" ]; then
 
-		# 1st run goes without login
 		mkdir -p /etc/lightdm/lightdm.conf.d
 		cat <<- EOF > /etc/lightdm/lightdm.conf.d/22-armbian-autologin.conf
 			[Seat:*]
@@ -172,10 +148,6 @@ if [[ -f /root/.fxBlox_custom_script_service ]]; then
 		# select mate session
 		[[ -x $(command -v mate-wm) ]] && sed -i "s/user-session.*/user-session=mate/" /etc/lightdm/lightdm.conf.d/11-armbian.conf
 		[[ -x $(command -v mate-wm) ]] && sed -i "s/user-session.*/user-session=mate/" /etc/lightdm/lightdm.conf.d/22-armbian-autologin.conf
-
-		# select plasma wayland session # @TODO: rpardini: dead code? kde-plasma desktop should use sddm, not lightdm.
-		[[ -x $(command -v plasmashell) ]] && sed -i "s/user-session.*/user-session=plasmawayland/" /etc/lightdm/lightdm.conf.d/11-armbian.conf
-		[[ -x $(command -v plasmashell) ]] && sed -i "s/user-session.*/user-session=plasmawayland/" /etc/lightdm/lightdm.conf.d/22-armbian-autologin.conf
 
 		# select sway wayland session
 		[[ -x $(command -v sway) ]] && sed -i "s/user-session.*/user-session=sway/" /etc/lightdm/lightdm.conf.d/11-armbian.conf
@@ -236,11 +208,37 @@ if [[ -f /root/.fxBlox_custom_script_service ]]; then
 			who -la | grep root | grep -q tty1 && exit 1
 		fi
 	elif [[ "${desktop_dm}" == "sddm" ]] && [ -n "$RealName" ]; then
-		# No hacks for sddm. User will have to input password again, and have  chance to choose session wayland
+
+		# create default sddm config
+		mkdir -p /etc/sddm.conf.d
+		cat <<- EOF > /etc/sddm.conf.d/armbian.conf
+			[Theme]
+			Current=breeze
+			[General]
+			InputMethod=none
+		EOF
+
+		# 1st run goes without login
+		cat <<- EOF > /etc/sddm.conf.d/autologin.conf
+			[Autologin]
+			User=$RealUserName
+		EOF
 		echo -e "\n\e[1m\e[39mNow starting desktop environment via ${desktop_dm}...\x1B[0m\n"
-		systemctl enable --now sddm
+		systemctl enable --now sddm 2> /dev/null
+
+		if [ -f /root/.desktop_autologin ]; then
+				rm /root/.desktop_autologin
+		else
+			systemctl -q enable armbian-disable-autologin.timer
+		fi
+		# logout if logged at console
+		who -la | grep root | grep -q tty1 && exit 1
+
 	else
-		# no display manager detected
+		# no display manager detected -> clear screen and show motd
+		clear
+		run-parts --lsbsysinit /etc/update-motd.d
+
 		# Display reboot recommendation if necessary
 		if [[ -f /var/run/resize2fs-reboot ]]; then
 			printf "\n\n\e[0;91mWarning: a reboot is needed to finish resizing the filesystem \x1B[0m \n"
@@ -248,7 +246,6 @@ if [[ -f /root/.fxBlox_custom_script_service ]]; then
 		fi
 	fi
 
-	usermod -aG docker "$RealUserName"
 
 	rm -f /root/.fxBlox_custom_script_service
 	sync

@@ -56,17 +56,11 @@ fxBloxCustomScript()
 	# read all variable from config file
 	source /tmp/overlay/config
 		
-	#fix blutooth frimware loading error
-	echo "fix blutooth"
-	ln -s /lib/firmware/rtl8852bu_config /lib/firmware/rtl_bt/rtl8852bu_config.bin
-	ln -s /lib/firmware/rtl8852bu_fw /lib/firmware/rtl_bt/rtl8852bu_fw.bin
-
 	fxBloxCustomScriptService;
 
 	InstallpythonPackages;
 	
 	InstallDocker;
-	#InstallDockerOffline;
 	
 	InstallFulaOTA;
 
@@ -76,6 +70,8 @@ fxBloxCustomScriptService()
 {
 	echo "install fxBlox Custom Script Service"
 
+
+	# disable armbian autoconfig
 	rm /root/.not_logged_in_yet
 
 	mkdir -p /usr/bin/fula/
@@ -91,11 +87,11 @@ fxBloxCustomScriptService()
 	cat > /etc/systemd/system/fxBlox_custom_script_service.service <<- EOF
 [Unit]
 Description=fxBlox custom script service
-After=multi-user.target network.target
+After=default.target
 ConditionPathExists=/root/.fxBlox_custom_script_service
 
 [Service]
-Type=oneshot
+Type=simple
 User=root
 Group=root
 ExecStart=/bin/bash /usr/bin/fxBlox_custom_script_service.sh
@@ -103,7 +99,7 @@ RemainAfterExit=yes
 TimeoutStartSec=infinity
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=default.target
 	EOF
 	systemctl --no-reload enable fxBlox_custom_script_service.service
 
@@ -132,7 +128,7 @@ InstallDocker()
 
 	#Add Docker's official GPG key:
 	for pkg in docker.io docker-doc docker-compose docker-compose-v2 podman-docker containerd runc; do apt-get remove $pkg; done
-	#apt-get update
+
 	# Add Docker's official GPG key:
 	apt-get update
 	apt-get install ca-certificates curl
@@ -156,19 +152,6 @@ InstallDocker()
 	ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
 } # InstallDocker
 
-InstallDockerOffline()
-{
-	echo "installing docker"
-	apt install /tmp/overlay/docker/*.deb
-
-	#Install Docker Compose 1.29.2
-	echo "Docker Compose"
-	cp /tmp/overlay/docker/docker-compose /usr/local/bin/docker-compose
-	chmod +x /usr/local/bin/docker-compose
-	ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
-
-} # InstallDockerOffline
-
 InstallFulaOTA()
 {
 	echo "Install Fula OTA"
@@ -176,11 +159,7 @@ InstallFulaOTA()
 	mkdir -p /home/$ARMBIAN_USER_NAME
 	#chown -R $ARMBIAN_USER_NAME:$ARMBIAN_USER_NAME /home/$ARMBIAN_USER_NAME
 
-	git clone -b main https://github.com/functionland/fula-ota /home/$ARMBIAN_USER_NAME/fula-ota
-
-	#copy offline docker
-	#mkdir -p /usr/bin/fula/
-	#cp /tmp/overlay/offline_docker/* /usr/bin/fula/
+	git clone --depth=1 -b main https://github.com/functionland/fula-ota /home/$ARMBIAN_USER_NAME/fula-ota
 
 	cd /home/$ARMBIAN_USER_NAME/fula-ota/docker/fxsupport/linux
 	bash ./fula.sh install chroot
