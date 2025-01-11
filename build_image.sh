@@ -105,7 +105,7 @@ ArmbianCompileServer()
 	logrotate python3-pip mergerfs inotify-tools python3-dbus dnsmasq-base \
 	python3-dev python-is-python3 python3-pip python3-gi python3-gi-cairo gir1.2-gtk-3.0 dnsmasq-base lshw  \
 	debhelper build-essential ntfs-3g fakeroot lockfile-progs \
-	libip6tc2 libnftnl11 iptables \
+	libip6tc2 libnftnl11 iptables iptables-persistent dnsutils \
 	" \
 	#usbmount: ebhelper build-essential ntfs-3g fakeroot lockfile-progs
 	#docker:   libip6tc2 libnftnl11 iptables
@@ -135,7 +135,7 @@ ArmbianCompileDesktop()
 	logrotate python3-pip mergerfs inotify-tools python3-dbus dnsmasq-base \
 	python3-dev python-is-python3 python3-pip python3-gi python3-gi-cairo gir1.2-gtk-3.0 dnsmasq-base lshw  \
 	debhelper build-essential ntfs-3g fakeroot lockfile-progs \
-	libip6tc2 libnftnl11 iptables \
+	libip6tc2 libnftnl11 iptables iptables-persistent dnsutils \
 	" \
 	#usbmount: ebhelper build-essential ntfs-3g fakeroot lockfile-progs
 	#docker:   libip6tc2 libnftnl11 iptables
