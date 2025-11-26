@@ -127,11 +127,11 @@ InstallDocker()
 	echo "installing docker"
 
 	#Add Docker's official GPG key:
-	for pkg in docker.io docker-doc docker-compose docker-compose-v2 podman-docker containerd runc; do apt-get remove $pkg; done
+	for pkg in docker.io docker-doc docker-compose docker-compose-v2 podman-docker containerd runc; do apt-get remove -y $pkg; done
 
 	# Add Docker's official GPG key:
 	apt-get update
-	apt-get install ca-certificates curl
+	apt-get install -y ca-certificates curl
 	install -m 0755 -d /etc/apt/keyrings
 	curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
 	chmod a+r /etc/apt/keyrings/docker.asc
@@ -143,7 +143,7 @@ InstallDocker()
 	tee /etc/apt/sources.list.d/docker.list > /dev/null
 	apt-get update
 
-	apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+	apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
 	#Install Docker Compose 1.29.2
 	echo "Docker Compose"
