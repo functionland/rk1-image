@@ -44,7 +44,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
-        python-version: '3.x'  # Set up the Python version you need
+        python-version: '3.14.0'  # Set up the Python version you need
 
     - name: Remove existing build folder
       run: |
