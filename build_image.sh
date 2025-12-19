@@ -6,7 +6,7 @@ DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 BUILD_PATH=$DIR/build
 ARMBIAN_PATH=$BUILD_PATH/armbian-build
 ARMBIAN_IMAGE_PATH=$ARMBIAN_PATH/output/images
-BOOTLOADER_IMAGE_PATH=$ARMBIAN_PATH/cache/sources/u-boot-worktree/u-boot-rockchip64/
+BOOTLOADER_IMAGE_PATH=$ARMBIAN_PATH/cache/sources/u-boot-worktree/u-boot-rockchip64/next-dev-v2024.03/
 ########################################################
 Main() {
 
