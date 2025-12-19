@@ -6,7 +6,7 @@ DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 BUILD_PATH=$DIR/build
 ARMBIAN_PATH=$BUILD_PATH/armbian-build
 ARMBIAN_IMAGE_PATH=$ARMBIAN_PATH/output/images
-BOOTLOADER_IMAGE_PATH=$ARMBIAN_PATH/cache/sources/u-boot-worktree/u-boot-rockchip64/next-dev-v2024.03/
+BOOTLOADER_IMAGE_PATH=$ARMBIAN_PATH/cache/sources/u-boot-worktree/u-boot-rockchip64/
 ########################################################
 Main() {
 
@@ -89,7 +89,7 @@ ArmbianCompileServer()
 	$ARMBIAN_PATH/compile.sh \
 	BOARD=fxblox-rk1 \
 	BRANCH=vendor \
-	RELEASE=jammy \
+	RELEASE=noble \
 	EXTRAWIFI=yes \
 	BUILD_DESKTOP=no \
 	BUILD_MINIMAL=yes \
@@ -105,7 +105,7 @@ ArmbianCompileServer()
 	logrotate python3-pip mergerfs inotify-tools python3-dbus dnsmasq-base \
 	python3-dev python-is-python3 python3-pip python3-gi python3-gi-cairo gir1.2-gtk-3.0 dnsmasq-base lshw  \
 	debhelper build-essential ntfs-3g fakeroot lockfile-progs \
-	libip6tc2 libnftnl11 iptables iptables-persistent dnsutils resolvconf \
+	libip6tc2 libnftnl11 iptables iptables-persistent dnsutils \
 	" \
 	#usbmount: ebhelper build-essential ntfs-3g fakeroot lockfile-progs
 	#docker:   libip6tc2 libnftnl11 iptables
@@ -124,7 +124,7 @@ ArmbianCompileDesktop()
 	DESKTOP_ENVIRONMENT=gnome \
 	DESKTOP_ENVIRONMENT_CONFIG_NAME=config_base \
 	KERNEL_CONFIGURE=no \
-	RELEASE=jammy \
+	RELEASE=noble \
 	KERNEL_GIT=shallow \
 	EXPERT="yes" \
 	CLEAN_LEVEL=oldcache \
@@ -135,7 +135,7 @@ ArmbianCompileDesktop()
 	logrotate python3-pip mergerfs inotify-tools python3-dbus dnsmasq-base \
 	python3-dev python-is-python3 python3-pip python3-gi python3-gi-cairo gir1.2-gtk-3.0 dnsmasq-base lshw  \
 	debhelper build-essential ntfs-3g fakeroot lockfile-progs \
-	libip6tc2 libnftnl11 iptables iptables-persistent dnsutils resolvconf \
+	libip6tc2 libnftnl11 iptables iptables-persistent dnsutils \
 	" \
 	#usbmount: ebhelper build-essential ntfs-3g fakeroot lockfile-progs
 	#docker:   libip6tc2 libnftnl11 iptables
@@ -148,7 +148,19 @@ CreateUsbFlashUpdate()
 	echo "Create USB Flash Update files"
 
 	echo "copy bootloader to output folder"
-	cp $BOOTLOADER_IMAGE_PATH/rkspi_loader.img $BUILD_PATH/flash.img
+	# Find rkspi_loader.img dynamically as u-boot version path varies between Armbian releases
+	RKSPI_LOADER=$(find $BOOTLOADER_IMAGE_PATH -name "rkspi_loader.img" -type f 2>/dev/null | head -n 1)
+	if [ -z "$RKSPI_LOADER" ]; then
+		echo "Warning: rkspi_loader.img not found in $BOOTLOADER_IMAGE_PATH"
+		echo "Searching in alternative locations..."
+		RKSPI_LOADER=$(find $ARMBIAN_PATH/cache/sources -name "rkspi_loader.img" -type f 2>/dev/null | head -n 1)
+	fi
+	if [ -n "$RKSPI_LOADER" ]; then
+		cp "$RKSPI_LOADER" $BUILD_PATH/flash.img
+	else
+		echo "Error: Could not find rkspi_loader.img"
+		exit 1
+	fi
 	
 	echo "Split update file to 1GB parts"
 	split -d -a 1 -b 1G $ARMBIAN_IMAGE_PATH/*.img $BUILD_PATH/update.img. --verbose

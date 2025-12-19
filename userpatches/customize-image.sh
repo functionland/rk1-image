@@ -38,6 +38,9 @@ Main() {
 		jammy)
 			Install;
 			;;
+		noble)
+			Install;
+			;;
 	esac
 } # Main
 
