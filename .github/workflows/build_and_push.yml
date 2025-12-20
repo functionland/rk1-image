@@ -2,6 +2,15 @@ name: Build and Upload
 
 on: 
   workflow_dispatch:  # This allows you to manually trigger the workflow
+    inputs:
+      reflash_bootloader:
+        description: 'Regenerate flash.img bootloader (WARNING: use only for testing new bootloader)'
+        required: false
+        default: 'no'
+        type: choice
+        options:
+          - 'no'
+          - 'yes'
 
 jobs:
   build-and-upload:
@@ -25,6 +34,8 @@ jobs:
         python-version: '3.x'  # Set up the Python version you need
 
     - name: Run build script
+      env:
+        REFLASH_BOOTLOADER: ${{ github.event.inputs.reflash_bootloader || 'no' }}
       run: |
         chmod +x ./build_image.sh
         bash ./build_image.sh desktop

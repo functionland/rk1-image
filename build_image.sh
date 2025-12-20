@@ -7,6 +7,13 @@ BUILD_PATH=$DIR/build
 ARMBIAN_PATH=$BUILD_PATH/armbian-build
 ARMBIAN_IMAGE_PATH=$ARMBIAN_PATH/output/images
 BOOTLOADER_IMAGE_PATH=$ARMBIAN_PATH/cache/sources/u-boot-worktree/u-boot-rockchip64/next-dev-v2024.03/
+
+# Pre-tested flash.img location (SPINOR bootloader)
+# Using pre-tested bootloader by default to prevent bricking devices
+PRETESTED_FLASH_IMG=$DIR/userpatches/flash/flash.img
+
+# Set REFLASH_BOOTLOADER=yes to regenerate flash.img from build instead of using pre-tested
+: ${REFLASH_BOOTLOADER:=no}
 ########################################################
 Main() {
 
@@ -147,19 +154,35 @@ CreateUsbFlashUpdate()
 {
 	echo "Create USB Flash Update files"
 
-	echo "copy bootloader to output folder"
-	# Find rkspi_loader.img dynamically as u-boot version path varies between Armbian releases
-	RKSPI_LOADER=$(find $BOOTLOADER_IMAGE_PATH -name "rkspi_loader.img" -type f 2>/dev/null | head -n 1)
-	if [ -z "$RKSPI_LOADER" ]; then
-		echo "Warning: rkspi_loader.img not found in $BOOTLOADER_IMAGE_PATH"
-		echo "Searching in alternative locations..."
-		RKSPI_LOADER=$(find $ARMBIAN_PATH/cache/sources -name "rkspi_loader.img" -type f 2>/dev/null | head -n 1)
-	fi
-	if [ -n "$RKSPI_LOADER" ]; then
-		cp "$RKSPI_LOADER" $BUILD_PATH/flash.img
+	echo "Preparing bootloader (flash.img)..."
+	
+	if [ "$REFLASH_BOOTLOADER" = "yes" ]; then
+		echo "REFLASH_BOOTLOADER=yes: Generating NEW flash.img from build"
+		echo "WARNING: This is a new bootloader - test carefully before deploying!"
+		# Find rkspi_loader.img dynamically as u-boot version path varies between Armbian releases
+		RKSPI_LOADER=$(find $BOOTLOADER_IMAGE_PATH -name "rkspi_loader.img" -type f 2>/dev/null | head -n 1)
+		if [ -z "$RKSPI_LOADER" ]; then
+			echo "Warning: rkspi_loader.img not found in $BOOTLOADER_IMAGE_PATH"
+			echo "Searching in alternative locations..."
+			RKSPI_LOADER=$(find $ARMBIAN_PATH/cache/sources -name "rkspi_loader.img" -type f 2>/dev/null | head -n 1)
+		fi
+		if [ -n "$RKSPI_LOADER" ]; then
+			cp "$RKSPI_LOADER" $BUILD_PATH/flash.img
+			echo "New flash.img created from: $RKSPI_LOADER"
+		else
+			echo "Error: Could not find rkspi_loader.img"
+			exit 1
+		fi
 	else
-		echo "Error: Could not find rkspi_loader.img"
-		exit 1
+		echo "Using pre-tested flash.img (default safe mode)"
+		if [ -f "$PRETESTED_FLASH_IMG" ]; then
+			cp "$PRETESTED_FLASH_IMG" $BUILD_PATH/flash.img
+			echo "Copied pre-tested flash.img from: $PRETESTED_FLASH_IMG"
+		else
+			echo "Error: Pre-tested flash.img not found at $PRETESTED_FLASH_IMG"
+			echo "Either place a tested flash.img there or set REFLASH_BOOTLOADER=yes to generate new one"
+			exit 1
+		fi
 	fi
 	
 	echo "Split update file to 1GB parts"
